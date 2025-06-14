@@ -3,15 +3,12 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
 Route::get('/home', function(){
     return view('teacher.home');
 })->name('homeTeacher');
 
 Route::get('/classInformation', function(){
-    return view('teacher.classInformation');
+    return view('teacher.addClassInformation');
 })->name('classInformation');
 
 Route::get('class', function(){
@@ -21,6 +18,10 @@ Route::get('class', function(){
 Route::get('/studentInformation', function(){
     return view('teacher.studentInformation');
 })->name('studentInformation');
+
+Route::get('/studentGrade', function(){
+    return view('teacher.editStudentGrade');
+})->name('editGrade');
 
 Route::get('/dashboard', function () {
     return view('dashboard');

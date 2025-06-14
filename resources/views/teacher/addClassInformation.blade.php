@@ -27,21 +27,24 @@
     <section class="container p-3 mt-5 rounded-4" style="background-color: #cfe2ff">
         <h2>Informações sobre a turma: ???</h2>
         <div class="row rounded p-4">
-            {{-- right of section --}}
-            <div class="col-md-5">
-                <div class="border rounded p-3 bg-white">
-                    <form class="form-control d-flex justify-content-center align-items-center flex-column p-3">
+            <!-- Formulário -->
+            <div class="col-12 col-md-5 mb-3 mb-md-0">
+                <div class="border rounded p-3 bg-white h-100">
+                    <form class="w-100 d-flex flex-column">
                         <h5 class="text-center"><strong>Adicionar</strong></h5>
-                        <p class="text-center">Escreva a baixo as informações ou avisos para a turma ???</p>
-                        <textarea class="text-center form-control" placeholder="Escreva aqui"></textarea>
-                        <input type="submit" value="Adicionar" class="btn btn-outline-secondary btn-sm mt-3">
+                        <p class="text-center">Escreva abaixo as informações ou avisos para a turma ???</p>
+                        
+                        <textarea class="form-control mb-3 text-center" placeholder="Escreva aqui"></textarea>
+                        
+                        <input type="submit" value="Adicionar" class="btn btn-outline-secondary btn-sm align-self-center">
                     </form>
                 </div>
             </div>
-            {{-- left of section --}}
-            <div class="col-md-7">
-                <div class="border rounded p-3 h-100 d-flex align-items-center justify-content-center bg-light text-center">
-                    <span>Informacoes atuais</span>
+
+            <!-- Informações atuais -->
+            <div class="col-12 col-md-7">
+                <div class="border rounded p-3 bg-light h-100 d-flex align-items-center justify-content-center text-center">
+                    <span>Informações atuais</span>
                 </div>
             </div>
         </div>

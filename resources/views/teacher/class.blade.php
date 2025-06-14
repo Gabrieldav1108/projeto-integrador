@@ -27,34 +27,38 @@
     <section class="container p-4 mt-5 rounded-4" style="background-color: #cfe2ff">
         <h2>Informações da turma</h2>
         <div class="row rounded p-4 align-items-stretch">
-            {{-- right of section --}}
-            <div class="col-md-6 d-flex flex-column">
+            
+            <!-- Alunos matriculados -->
+            <div class="col-12 col-md-6 mb-4 mb-md-0 d-flex flex-column">
                 <h3>Alunos matriculados</h3>
-                <div class="border rounded p-3 bg-white" data-bs-spy="scroll">
+                <div class="border rounded p-3 bg-white h-100" data-bs-spy="scroll">
                     <ul class="list-group">
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <span>Nome do aluno 1</span>
-                            <a href={{route('studentInformation')}} class="btn btn-primary m-1">Ver aluno</a>
+                            <a href={{ route('studentInformation') }} class="btn btn-primary m-1">Ver aluno</a>
                         </li>
-                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
                             <span>Nome do aluno 1</span>
-                            <a href={{route('studentInformation')}} class="btn btn-primary m-1">Ver aluno</a>
+                            <a href={{ route('studentInformation') }} class="btn btn-primary m-1">Ver aluno</a>
                         </li>
-                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
                             <span>Nome do aluno 1</span>
-                            <a href={{route('studentInformation')}} class="btn btn-primary m-1">Ver aluno</a>
+                            <a href={{ route('studentInformation') }} class="btn btn-primary m-1">Ver aluno</a>
                         </li>
-                        
                     </ul>
                 </div>
             </div>
-            {{-- left of section --}}
-            <div class="col-md-6 d-flex flex-column">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h3 class="mb-0">Avisos</h3>
-                    <a href={{route('classInformation')}} class="btn btn-primary">Adicionar informações</a>
+
+            <!-- Avisos -->
+            <div class="col-12 col-md-6 d-flex flex-column">
+                <!-- Cabeçalho com botão -->
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
+                    <h3 class="mb-2 mb-md-0">Avisos</h3>
+                    <a href={{ route('classInformation') }} class="btn btn-primary w-100 w-md-auto">Adicionar informações</a>
                 </div>
-                <div class="h-100 border rounded p-3 d-flex align-items-center justify-content-center bg-light text-center">
+
+                <!-- Conteúdo dos avisos -->
+                <div class="border rounded p-3 bg-light h-100 d-flex align-items-center justify-content-center text-center">
                     <span>Informações que o professor adicionar como datas de provas ou entrega de trabalhos</span>
                 </div>
             </div>

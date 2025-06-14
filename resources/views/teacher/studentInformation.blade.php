@@ -47,23 +47,23 @@
                         <tbody>
                             <tr>
                                 <td>1°</td>
-                                <td><button class="btn btn-link p-0 text-decoration-none">Nota 1</button></td>
-                                <td><button class="btn btn-link p-0 text-decoration-none">Nota 1</button></td>
-                                <td><button class="btn btn-link p-0 text-decoration-none">Nota 1</button></td>
+                                <td><a href={{route('editGrade')}} class="btn btn-link p-0 text-decoration-none">Nota 1</a href={{route('editGrade')}}></td>
+                                <td><a href={{route('editGrade')}} class="btn btn-link p-0 text-decoration-none">Nota 1</a href={{route('editGrade')}}></td>
+                                <td><a href={{route('editGrade')}} class="btn btn-link p-0 text-decoration-none">Nota 1</a href={{route('editGrade')}}></td>
                                 <td>Total</td>
                             </tr>
                             <tr>
                                 <td>2°</td>
-                                <td><button class="btn btn-link p-0 text-decoration-none">Nota 2</button></td>
-                                <td><button class="btn btn-link p-0 text-decoration-none">Nota 2</button></td>
-                                <td><button class="btn btn-link p-0 text-decoration-none">Nota 2</button></td>
+                                <td><a href={{route('editGrade')}} class="btn btn-link p-0 text-decoration-none">Nota 2</a href={{route('editGrade')}}></td>
+                                <td><a href={{route('editGrade')}} class="btn btn-link p-0 text-decoration-none">Nota 2</a href={{route('editGrade')}}></td>
+                                <td><a href={{route('editGrade')}} class="btn btn-link p-0 text-decoration-none">Nota 2</a href={{route('editGrade')}}></td>
                                 <td>Total</td>
                             </tr>
                             <tr>
                                 <td>3°</td>
-                                <td><button class="btn btn-link p-0 text-decoration-none">Nota 3</button></td>
-                                <td><button class="btn btn-link p-0 text-decoration-none">Nota 3</button></td>
-                                <td><button class="btn btn-link p-0 text-decoration-none">Nota 3</button></td>
+                                <td><a href={{route('editGrade')}} class="btn btn-link p-0 text-decoration-none">Nota 3</a href={{route('editGrade')}}></td>
+                                <td><a href={{route('editGrade')}} class="btn btn-link p-0 text-decoration-none">Nota 3</a href={{route('editGrade')}}></td>
+                                <td><a href={{route('editGrade')}} class="btn btn-link p-0 text-decoration-none">Nota 3</a href={{route('editGrade')}}></td>
                                 <td>Total</td>
                             </tr>
                             <tr>
