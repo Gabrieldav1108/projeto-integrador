@@ -9,9 +9,18 @@ use Illuminate\Support\Facades\Route;
 Route::get('/home', function(){
     return view('teacher.home');
 })->name('homeTeacher');
+
 Route::get('/classInformation', function(){
     return view('teacher.classInformation');
 })->name('classInformation');
+
+Route::get('class', function(){
+    return view('teacher.class');
+})->name('class');
+
+Route::get('/studentInformation', function(){
+    return view('teacher.studentInformation');
+})->name('studentInformation');
 
 Route::get('/dashboard', function () {
     return view('dashboard');

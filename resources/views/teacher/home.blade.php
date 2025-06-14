@@ -31,28 +31,28 @@
                 <div class="p-3 border rounded text-center border-black border-2 shadow" style="background-color: #e0efff" >
                     <h5 class="fw-bold">Nome da turma</h5>
                     <p>Nome da matéria</p>
-                    <a class="btn btn-primary fw-bold" href={{route('classInformation')}}>Ver turma</a>
+                    <a class="btn btn-primary fw-bold" href={{route('class')}}>Ver turma</a>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
                 <div class="p-3 border rounded text-center border-black border-2 shadow" style="background-color: #e0efff">
                     <h5 class="fw-bold">Nome da turma</h5>
                     <p>Nome da matéria</p>
-                    <a class="btn btn-primary fw-bold" href={{route('classInformation')}}>Ver turma</a>
+                    <a class="btn btn-primary fw-bold" href={{route('class')}}>Ver turma</a>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
                 <div class="p-3 border rounded text-center border-black border-2 shadow" style="background-color: #e0efff">
                     <h5 class="fw-bold">Nome da turma</h5>
                     <p>Nome da matéria</p>
-                    <a class="btn btn-primary fw-bold" href={{route('classInformation')}}>Ver turma</a>
+                    <a class="btn btn-primary fw-bold" href={{route('class')}}>Ver turma</a>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
                 <div class="p-3 border rounded text-center border-black border-2 shadow" style="background-color: #e0efff">
                     <h5 class="fw-bold">Nome da turma</h5>
                     <p>Nome da matéria</p>
-                    <a class="btn btn-primary fw-bold" href={{route('classInformation')}}>Ver turma</a>
+                    <a class="btn btn-primary fw-bold" href={{route('class')}}>Ver turma</a>
                 </div>
             </div>
 
@@ -61,28 +61,28 @@
                 <div class="p-3 border rounded text-center border-black border-2 shadow" style="background-color: #e0efff">
                     <h5 class="fw-bold">Nome da turma</h5>
                     <p>Nome da matéria</p>
-                    <a class="btn btn-primary fw-bold" href={{route('classInformation')}}>Ver turma</a>
+                    <a class="btn btn-primary fw-bold" href={{route('class')}}>Ver turma</a>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
                 <div class="p-3 border rounded text-center border-black border-2 shadow" style="background-color: #e0efff">
                     <h5 class="fw-bold">Nome da turma</h5>
                     <p>Nome da matéria</p>
-                    <a class="btn btn-primary fw-bold" href={{route('classInformation')}}>Ver turma</a>
+                    <a class="btn btn-primary fw-bold" href={{route('class')}}>Ver turma</a>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
                 <div class="p-3 border rounded text-center border-black border-2 shadow" style="background-color: #e0efff">
                     <h5 class="fw-bold">Nome da turma</h5>
                     <p>Nome da matéria</p>
-                    <a class="btn btn-primary fw-bold" href={{route('classInformation')}}>Ver turma</a>
+                    <a class="btn btn-primary fw-bold" href={{route('class')}}>Ver turma</a>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
                 <div class="p-3 border rounded text-center border-black border-2 shadow" style="background-color: #e0efff">
                     <h5 class="fw-bold">Nome da turma</h5>
                     <p>Nome da matéria</p>
-                    <a class="btn btn-primary fw-bold" href={{route('classInformation')}}>Ver turma</a>
+                    <a class="btn btn-primary fw-bold" href={{route('class')}}>Ver turma</a>
                 </div>
             </div>
     </section>

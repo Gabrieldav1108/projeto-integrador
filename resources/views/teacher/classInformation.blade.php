@@ -19,7 +19,7 @@
 
     <!-- Customized Bootstrap Stylesheet -->
     <link href="css/style.css" rel="stylesheet">
-    <title>Turma</title>
+    <title>Informações da turma</title>
 </head>
 <body>
     <x-header/>
