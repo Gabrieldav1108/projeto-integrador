@@ -23,6 +23,10 @@ Route::get('/studentGrade', function(){
     return view('teacher.editStudentGrade');
 })->name('editGrade');
 
+Route::get('/schedules', function () {
+    return view('teacher.schedules');
+})->name('schedules');
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');

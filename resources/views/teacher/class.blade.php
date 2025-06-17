@@ -54,7 +54,7 @@
                 <!-- Cabeçalho com botão -->
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
                     <h3 class="mb-2 mb-md-0">Avisos</h3>
-                    <a href={{ route('classInformation') }} class="btn btn-primary w-100 w-md-auto">Adicionar informações</a>
+                    <a href={{ route('classInformation') }} class="btn btn-primary w-md-auto">Adicionar informações</a>
                 </div>
 
                 <!-- Conteúdo dos avisos -->
