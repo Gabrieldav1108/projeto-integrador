@@ -30,28 +30,28 @@
                 <div class="p-3 border rounded text-center border-black border-2 shadow" style="background-color: #e0efff" >
                     <h5 class="fw-bold">Nome da Materia</h5>
                     <p>Nome do professor</p>
-                    <a class="btn btn-primary fw-bold" href={{route('class')}}>Ver Materia</a>
+                    <a class="btn btn-primary fw-bold" href={{route('classInformation')}}>Ver Materia</a>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
                 <div class="p-3 border rounded text-center border-black border-2 shadow" style="background-color: #e0efff">
                     <h5 class="fw-bold">Nome da Materia</h5>
                     <p>Nome do professor</p>
-                    <a class="btn btn-primary fw-bold" href={{route('class')}}>Ver Materia</a>
+                    <a class="btn btn-primary fw-bold" href={{route('classInformation')}}>Ver Materia</a>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
                 <div class="p-3 border rounded text-center border-black border-2 shadow" style="background-color: #e0efff">
                     <h5 class="fw-bold">Nome da Materia</h5>
                     <p>Nome do professor</p>
-                    <a class="btn btn-primary fw-bold" href={{route('class')}}>Ver Materia</a>
+                    <a class="btn btn-primary fw-bold" href={{route('classInformation')}}>Ver Materia</a>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
                 <div class="p-3 border rounded text-center border-black border-2 shadow" style="background-color: #e0efff">
                     <h5 class="fw-bold">Nome da Materia</h5>
                     <p>Nome do professor</p>
-                    <a class="btn btn-primary fw-bold" href={{route('class')}}>Ver Materia</a>
+                    <a class="btn btn-primary fw-bold" href={{route('classInformation')}}>Ver Materia</a>
                 </div>
             </div>
 
@@ -60,28 +60,28 @@
                 <div class="p-3 border rounded text-center border-black border-2 shadow" style="background-color: #e0efff">
                     <h5 class="fw-bold">Nome da Materia</h5>
                     <p>Nome do professor</p>
-                    <a class="btn btn-primary fw-bold" href={{route('class')}}>Ver Materia</a>
+                    <a class="btn btn-primary fw-bold" href={{route('classInformation')}}>Ver Materia</a>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
                 <div class="p-3 border rounded text-center border-black border-2 shadow" style="background-color: #e0efff">
                     <h5 class="fw-bold">Nome da Materia</h5>
                     <p>Nome do professor</p>
-                    <a class="btn btn-primary fw-bold" href={{route('class')}}>Ver Materia</a>
+                    <a class="btn btn-primary fw-bold" href={{route('classInformation')}}>Ver Materia</a>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
                 <div class="p-3 border rounded text-center border-black border-2 shadow" style="background-color: #e0efff">
                     <h5 class="fw-bold">Nome da Materia</h5>
                     <p>Nome do professor</p>
-                    <a class="btn btn-primary fw-bold" href={{route('class')}}>Ver Materia</a>
+                    <a class="btn btn-primary fw-bold" href={{route('classInformation')}}>Ver Materia</a>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
                 <div class="p-3 border rounded text-center border-black border-2 shadow" style="background-color: #e0efff">
                     <h5 class="fw-bold">Nome da Materia</h5>
                     <p>Nome do professor</p>
-                    <a class="btn btn-primary fw-bold" href={{route('class')}}>Ver Materia</a>
+                    <a class="btn btn-primary fw-bold" href={{route('classInformation')}}>Ver Materia</a>
                 </div>
             </div>
     </section>

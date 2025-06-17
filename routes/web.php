@@ -8,7 +8,7 @@ Route::get('/home', function(){
     return view('teacher.home');
 })->name('homeTeacher');
 
-Route::get('/classInformation', function(){
+Route::get('/addClassInformation', function(){
     return view('teacher.addClassInformation');
 })->name('classInformation');
 
@@ -33,6 +33,9 @@ Route::get('/homeStudent', function(){
     return view('student.home');
 })->name('studentHome');
 
+Route::get('classInformation', function(){
+    return view('student.classInformation');
+})->name('classInformation');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
