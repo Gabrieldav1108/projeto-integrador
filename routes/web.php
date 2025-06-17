@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
+//teacher
 Route::get('/home', function(){
     return view('teacher.home');
 })->name('homeTeacher');
@@ -26,6 +27,12 @@ Route::get('/studentGrade', function(){
 Route::get('/schedules', function () {
     return view('teacher.schedules');
 })->name('schedules');
+
+//student
+Route::get('/homeStudent', function(){
+    return view('student.home');
+})->name('studentHome');
+
 
 Route::get('/dashboard', function () {
     return view('dashboard');
