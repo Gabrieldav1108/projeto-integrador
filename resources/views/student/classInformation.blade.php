@@ -41,7 +41,7 @@
             <div class="col-12 col-md-6 d-flex flex-column" >
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
                     <h3 class="mb-2 mb-md-0">Avisos do professor</h3>
-                    <a href={{ route('classInformation') }} class="btn btn-primary w-md-auto">Notas</a>
+                    <a href={{ route('studentClassGrade') }} class="btn btn-primary w-md-auto">Notas</a>
                 </div>
 
                 <div class="border rounded p-3 bg-light h-100 d-flex align-items-center justify-content-center text-center" style="height: 300px;">

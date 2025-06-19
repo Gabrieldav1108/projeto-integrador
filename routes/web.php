@@ -29,13 +29,17 @@ Route::get('/schedules', function () {
 })->name('schedules');
 
 //student
-Route::get('/homeStudent', function(){
+Route::get('homeStudent', function(){
     return view('student.home');
 })->name('studentHome');
 
 Route::get('classInformation', function(){
     return view('student.classInformation');
 })->name('classInformation');
+
+Route::get('classGrade', function () {
+    return view('student.classGrade');
+})->name('studentClassGrade');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
