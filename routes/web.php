@@ -41,9 +41,9 @@ Route::get('classGrade', function () {
     return view('student.classGrade');
 })->name('studentClassGrade');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('schedulesStudent', function(){
+    return view('student.schedules');
+})->name('studentSchedules');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
