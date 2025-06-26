@@ -31,12 +31,12 @@
             <div class="col-12 col-md-5 mb-3 mb-md-0">
                 <div class="border rounded p-3 bg-white h-100">
                     <form class="w-100 d-flex flex-column">
-                        <h5 class="text-center"><strong>Adicionar</strong></h5>
+                        <h5 class="text-center"><strong>Editar</strong></h5>
                         <p class="text-center">Escreva abaixo as informações ou avisos para a turma ???</p>
                         
-                        <textarea class="form-control mb-3 text-center" placeholder="Escreva aqui"></textarea>
+                        <textarea class="form-control mb-3 text-center" placeholder="Escreva aqui" value="Informações atuais estarao aqui"></textarea>
                         
-                        <input type="submit" value="Adicionar" class="btn btn-primary btn-sm align-self-center">
+                        <input type="submit" value="Editar" class="btn btn-primary btn-sm align-self-center">
                     </form>
                 </div>
             </div>

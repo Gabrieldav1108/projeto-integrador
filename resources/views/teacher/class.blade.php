@@ -54,12 +54,25 @@
                 <!-- Cabeçalho com botão -->
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
                     <h3 class="mb-2 mb-md-0">Avisos</h3>
-                    <a href={{ route('classInformation') }} class="btn btn-primary w-md-auto">Adicionar informações</a>
+                    <a href={{ route('addClassInformation') }} class="btn btn-primary w-md-auto">Adicionar informações</a>
                 </div>
 
                 <!-- Conteúdo dos avisos -->
-                <div class="border rounded p-3 bg-light h-100 d-flex align-items-center justify-content-center text-center">
-                    <span>Informações que o professor adicionar como datas de provas ou entrega de trabalhos</span>
+                <div class="border rounded p-3 bg-light h-100">
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Prova de matemática - 10/07
+                            <a href={{route('editClassInformation')}} class="btn btn-sm btn-outline-primary">Editar</a>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Entrega do trabalho de história - 15/07
+                            <a href={{route('editClassInformation')}} class="btn btn-sm btn-outline-primary">Editar</a>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Apresentação de ciências - 20/07
+                            <a href={{route('editClassInformation')}} class="btn btn-sm btn-outline-primary">Editar</a>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>

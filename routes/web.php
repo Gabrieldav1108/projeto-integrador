@@ -10,7 +10,11 @@ Route::get('/home', function(){
 
 Route::get('/addClassInformation', function(){
     return view('teacher.addClassInformation');
-})->name('classInformation');
+})->name('addClassInformation');
+
+Route::get('/editClassInformation', function(){
+    return view('teacher.editClassInformation');
+})->name('editClassInformation');
 
 Route::get('class', function(){
     return view('teacher.class');

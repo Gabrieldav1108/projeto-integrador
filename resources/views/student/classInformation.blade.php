@@ -44,8 +44,18 @@
                     <a href={{ route('studentClassGrade') }} class="btn btn-primary w-md-auto">Notas</a>
                 </div>
 
-                <div class="border rounded p-3 bg-light h-100 d-flex align-items-center justify-content-center text-center" style="height: 300px;">
-                    <span>Informações que o professor adicionar como datas de provas ou entrega de trabalhos</span>
+                <div class="border rounded p-3 bg-light h-100">
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Prova de matemática - 10/07
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Entrega do trabalho de história - 15/07
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Apresentação de ciências - 20/07
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
