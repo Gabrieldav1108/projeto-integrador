@@ -44,6 +44,9 @@ Route::get('classGrade', function () {
 Route::get('schedulesStudent', function(){
     return view('student.schedules');
 })->name('studentSchedules');
+Route::get('/bulletin', function () {
+    return view('student.bulletin');
+})->name('bulletin');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
