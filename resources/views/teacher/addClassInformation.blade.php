@@ -28,23 +28,42 @@
         <h2>Informações sobre a turma: ???</h2>
         <div class="row rounded p-4">
             <!-- Formulário -->
-            <div class="col-12 col-md-5 mb-3 mb-md-0">
+            <div class="col-12 col-md-5 mb-3 mb-md-0 mt-4">
                 <div class="border rounded p-3 bg-white h-100">
                     <form class="w-100 d-flex flex-column">
                         <h5 class="text-center"><strong>Adicionar</strong></h5>
                         <p class="text-center">Escreva abaixo as informações ou avisos para a turma ???</p>
                         
-                        <textarea class="form-control mb-3 text-center" placeholder="Escreva aqui"></textarea>
+                        <label class="form-label" for="body">Digite o aviso</label>
+                        <input type="text" class="form-control" name="content" id="content" placeholder="Digite aqui!">
+
+                        <label class="form-label mt-2" for="body">Digite uma data(se tiver)</label>
+                        <input type="date" class="form-control" name="content" id="content" placeholder="Digite aqui!">
+
+                        <label class="form-label mt-2" for="body">Digite um horário(se tiver)</label>
+                        <input type="date" class="form-control" name="content" id="content" placeholder="Digite aqui!">
                         
-                        <input type="submit" value="Adicionar" class="btn btn-primary btn-sm align-self-center">
+                        <input type="submit" value="Adicionar" class="btn btn-primary btn-sm align-self-center mt-3">
                     </form>
                 </div>
             </div>
 
             <!-- Informações atuais -->
-            <div class="col-12 col-md-7">
-                <div class="border rounded p-3 bg-light h-100 d-flex align-items-center justify-content-center text-center">
-                    <span>Informações atuais</span>
+            <div class="col-12 col-md-6 d-flex flex-column" >
+                <h5>Informações atuais</h5>
+
+                <div class="border rounded p-3 bg-light h-100">
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Prova de matemática - 10/07
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Entrega do trabalho de história - 15/07
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Apresentação de ciências - 20/07
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
