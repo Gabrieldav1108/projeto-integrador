@@ -62,16 +62,24 @@
                     <ul class="list-group">
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             Prova de matemática - 10/07
-                            <a href={{route('editClassInformation')}} class="btn btn-sm btn-outline-primary">Editar</a>
+                            <div>
+                                <a href="#" class="btn btn-sm btn-outline-danger">Excluir</a>
+                                <a href={{route('editClassInformation')}} class="btn btn-sm btn-outline-primary">Editar</a>
+                            </div>
                         </li>
+
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             Entrega do trabalho de história - 15/07
-                            <a href={{route('editClassInformation')}} class="btn btn-sm btn-outline-primary">Editar</a>
-                        </li>
+                            <div>
+                                <a href="#" class="btn btn-sm btn-outline-danger">Excluir</a>
+                                <a href={{route('editClassInformation')}} class="btn btn-sm btn-outline-primary">Editar</a>
+                            </div>                        </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             Apresentação de ciências - 20/07
-                            <a href={{route('editClassInformation')}} class="btn btn-sm btn-outline-primary">Editar</a>
-                        </li>
+                            <div>
+                                <a href="#" class="btn btn-sm btn-outline-danger">Excluir</a>
+                                <a href={{route('editClassInformation')}} class="btn btn-sm btn-outline-primary">Editar</a>
+                            </div>                        </li>
                     </ul>
                 </div>
             </div>
