@@ -5,18 +5,19 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: laravel-app
+    container_name: projeto
     working_dir: /var/www
     volumes:
       - .:/var/www
+    entrypoint: ["/bin/bash", "/var/www/entrypoints.sh"]
     networks:
       - laravel
 
   nginx:
     image: nginx:alpine
-    container_name: laravel-nginx
+    container_name: projeto-nginx
     ports:
-      - "8000:80"
+      - "8080:80"
     volumes:
       - .:/var/www
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
