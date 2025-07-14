@@ -53,11 +53,21 @@ Route::get('/bulletin', function () {
     return view('student.bulletin');
 })->name('bulletin');
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
+//-------------------profile------------------
+
+Route::get('/profile', function(){
+    return view('user.profile');
+})->name('profile');
+
+Route::get('editProfile', function(){
+    return view('user.editProfile');
+})->name('editProfile');
+
+// Route::middleware('auth')->group(function () {
+//     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+//     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+//     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+// });
 
 Route::get('/logout', function () {
     Auth::logout();
