@@ -1,37 +1,41 @@
 FROM php:8.3-fpm
 
-# Instalar dependências do sistema
+# 1. Instalar dependências do sistema
 RUN apt-get update && apt-get install -y \
     git curl zip unzip libpng-dev libonig-dev libxml2-dev \
     libzip-dev libjpeg-dev libfreetype6-dev gnupg \
-    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) pdo pdo_mysql mbstring exif pcntl bcmath gd zip \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Instalar Node.js LTS (via n)
-RUN curl -fsSL https://raw.githubusercontent.com/tj/n/master/bin/n | bash -s lts \
+# 2. Instalar Node.js e npm
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
     && npm install -g npm
 
-# Instalar Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# 3. Instalar Composer globalmente
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Definir diretório de trabalho
 WORKDIR /var/www
 
-# Copiar arquivos da aplicação
+# 4. Copiar apenas arquivos de dependência primeiro (para cache)
+COPY composer.json composer.lock package.json package-lock.json ./
+
+# 5. Instalar dependências PHP e Node em etapas separadas
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-scripts
+
 COPY . .
 
-# Instalar dependências do Laravel
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+RUN npm ci --no-audit && \
+    npm run build && \
+    chown -R www-data:www-data /var/www && \
+    chmod -R 775 storage bootstrap/cache
 
-# Instalar e buildar assets (Bootstrap, Vite, Breeze)
-RUN npm install && npm install sass && npm run build
-
-# Permissões
-RUN chown -R www-data:www-data /var/www \
-    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
-
-# Copiar entrypoint
-COPY entrypoints.sh /var/www/entrypoints.sh
-RUN chmod +x /var/www/entrypoints.sh
+# 6. Configuração final do PHP-FPM
+RUN cp /usr/local/etc/php-fpm.d/www.conf /usr/local/etc/php-fpm.d/www.conf.original && \
+    sed -i 's/listen = 127.0.0.1:9000/listen = 9000/' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's/;listen.owner = www-data/listen.owner = www-data/' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's/;listen.group = www-data/listen.group = www-data/' /usr/local/etc/php-fpm.d/www.conf
 
 EXPOSE 9000
 CMD ["php-fpm"]
