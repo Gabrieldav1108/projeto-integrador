@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install -j$(nproc) pdo pdo_mysql mbstring exif pcntl bcmath gd zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# 2. Instalar Node.js e npm
+# 2. Instalar Node.js e npm (útil se for usar em desenvolvimento ou scripts simples)
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
     && apt-get install -y nodejs \
     && npm install -g npm
@@ -16,26 +16,32 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
 # 3. Instalar Composer globalmente
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
+# 4. Define diretório de trabalho
 WORKDIR /var/www
 
-# 4. Copiar apenas arquivos de dependência primeiro (para cache)
-COPY composer.json composer.lock package.json package-lock.json ./
+# 5. Copiar apenas arquivos de dependência para cache
+COPY composer.json composer.lock ./
 
-# 5. Instalar dependências PHP e Node em etapas separadas
+# 6. Instalar dependências PHP
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-scripts
 
+# 7. Copiar código-fonte completo
 COPY . .
 
-RUN npm ci --no-audit && \
-    npm run build && \
-    chown -R www-data:www-data /var/www && \
+# 8. Corrigir permissões de diretórios importantes
+RUN chown -R www-data:www-data /var/www && \
     chmod -R 775 storage bootstrap/cache
 
-# 6. Configuração final do PHP-FPM
-RUN cp /usr/local/etc/php-fpm.d/www.conf /usr/local/etc/php-fpm.d/www.conf.original && \
-    sed -i 's/listen = 127.0.0.1:9000/listen = 9000/' /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i 's/;listen.owner = www-data/listen.owner = www-data/' /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i 's/;listen.group = www-data/listen.group = www-data/' /usr/local/etc/php-fpm.d/www.conf
+# 9. Configurar PHP-FPM para escutar corretamente
+RUN sed -i 's|listen = 127.0.0.1:9000|listen = 9000|' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's|;listen.owner = www-data|listen.owner = www-data|' /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's|;listen.group = www-data|listen.group = www-data|' /usr/local/etc/php-fpm.d/www.conf
 
+# 10. Expor porta do PHP-FPM
 EXPOSE 9000
-CMD ["php-fpm"]
+
+# 11. Copiar e preparar script de inicialização
+COPY entrypoints.sh /usr/local/bin/entrypoints.sh
+RUN chmod +x /usr/local/bin/entrypoints.sh
+
+ENTRYPOINT ["entrypoints.sh"]
