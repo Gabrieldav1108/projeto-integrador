@@ -11,10 +11,11 @@ services:
     networks:
       - laravel_network
     healthcheck:
-      test: ["CMD", "php-fpm", "-t"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
+      test: ["CMD-SHELL", "[ -f .env ] && [ -f vendor/autoload.php ] && php-fpm -t"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
 
   vite:
     image: node:18
@@ -35,18 +36,16 @@ services:
       - laravel_network
 
   nginx:
-    image: nginx:alpine
+    build:
+      context: ./docker/nginx
     container_name: laravel-nginx
     ports:
       - "8080:80"
     volumes:
       - .:/var/www
-      - ./docker/nginx:/etc/nginx/conf.d
     depends_on:
       app:
         condition: service_healthy
-      vite:
-        condition: service_started
     networks:
       - laravel_network
 
