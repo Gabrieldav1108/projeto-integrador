@@ -7,6 +7,11 @@ if [ ! -f .env ]; then
   php artisan key:generate
 fi
 
+# Garante que a APP_KEY está definida
+if ! grep -q "^APP_KEY=" .env || grep -q "^APP_KEY=$" .env; then
+  php artisan key:generate --ansi
+fi
+
 # Permissões
 chown -R www-data:www-data storage bootstrap/cache
 chmod -R 775 storage bootstrap/cache
