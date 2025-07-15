@@ -29,7 +29,15 @@
         border-radius: 50%;
         border: 2px solid #007bff;
         margin-bottom: 1rem;
-    }
+        }
+        .profile-img, .profile-img-preview {
+          width: 150px;
+          height: 150px;
+          object-fit: cover;
+          border-radius: 50%;
+          border: 2px solid #007bff;
+          margin-bottom: 1rem;
+        }
     </style>
     <link href="css/style.css" rel="stylesheet">
     <title>Editar Perfil</title>
@@ -48,7 +56,7 @@
         <div class="row g-4">
           <!-- Foto do perfil -->
           <div class="col-md-4 text-center">
-            <img src="../../img/zentisu.webp" alt="Foto atual" class="profile-img-preview">
+            <img src="{{asset('img/sukuna.jpg')}}" alt="Foto atual" class="profile-img-preview">
             <div class="mt-2">
               <label for="foto" class="form-label fw-semibold">Alterar foto</label>
               <input class="form-control" type="file" id="foto" name="foto">
@@ -58,8 +66,8 @@
           <!-- Dados pessoais -->
           <div class="col-md-8">
             <div class="mb-3">
-              <label for="nome" class="form-label fw-semibold">Nome</label>
-              <input type="text" class="form-control" id="nome" name="nome" value="Gabriel Dávila">
+              <label for="name" class="form-label fw-semibold">Nome</label>
+              <input type="text" class="form-control" id="name" name="name" value="Gabriel Dávila">
             </div>
 
             <div class="mb-3">
@@ -68,8 +76,12 @@
             </div>
 
             <div class="mb-3">
-              <label for="instituicao" class="form-label fw-semibold">Instituição</label>
-              <input type="text" class="form-control" id="instituicao" name="instituicao" value="Escola Técnica XYZ">
+              <label for="password" class="form-label fw-semibold">Senha</label>
+              <input type="text" class="form-control" id="password" name="password" value="*********">
+            </div>
+            <div class="mb-3">
+              <label for="conf_password" class="form-label fw-semibold">Confirme a senha</label>
+              <input type="text" class="form-control" id="conf_password" name="conf_password" value="*********">
             </div>
 
             <div class="d-flex justify-content-end gap-2">

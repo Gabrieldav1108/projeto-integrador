@@ -18,7 +18,7 @@
     <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
 
     <!-- Customized Bootstrap Stylesheet -->
-    <style>
+     <style>
         .card-custom {
         background-color: #e1efff;
         border: 1px solid #00000022;
@@ -31,7 +31,15 @@
         border-radius: 50%;
         border: 2px solid #007bff;
         margin-bottom: 1rem;
-    }
+        }
+        .profile-img, .profile-img-preview {
+          width: 150px;
+          height: 150px;
+          object-fit: cover;
+          border-radius: 50%;
+          border: 2px solid #007bff;
+          margin-bottom: 1rem;
+        }
     </style>
     <link href="css/style.css" rel="stylesheet">
     <title>Perfil</title>
@@ -48,7 +56,7 @@
           <div class="p-4 card-custom shadow w-100 d-flex flex-column justify-content-between">
             <div>
               <div class="d-flex justify-content-center">
-                <img src="../.././img/zentisu.webp" alt="Foto de Perfil" class="profile-img">
+                <img src="{{asset('img/sukuna.jpg')}}" alt="Foto atual" class="profile-img-preview">
               </div>
               <h5 class="fw-bold mb-3 text-center">Informações Pessoais</h5>
               <p><strong>Nome:</strong> Gabriel Dávila</p>
