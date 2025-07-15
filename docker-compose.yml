@@ -10,6 +10,7 @@ services:
       - APP_ENV=local
     networks:
       - laravel_network
+    user: "0:0"  # Garante que permissões funcionem em qualquer sistema
     healthcheck:
       test: ["CMD-SHELL", "[ -f .env ] && [ -f vendor/autoload.php ] && php-fpm -t"]
       interval: 5s
