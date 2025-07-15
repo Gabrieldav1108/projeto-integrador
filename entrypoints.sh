@@ -1,6 +1,12 @@
 #!/bin/sh
 set -e
 
+# Instala as dependências PHP se não houver vendor
+if [ ! -f vendor/autoload.php ]; then
+  echo "Instalando dependências do PHP..."
+  composer install --no-interaction --prefer-dist --optimize-autoloader
+fi
+
 # Configurações básicas
 if [ ! -f .env ]; then
   cp .env.example .env
