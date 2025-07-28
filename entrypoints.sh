@@ -104,5 +104,11 @@ fi
 # ==============================================
 # 7. INICIALIZAÇÃO DO SERVIDOR
 # ==============================================
-echo "✅ Laravel totalmente configurado. Iniciando PHP-FPM..."
+if [ "$APP_ENV" = "local" ]; then
+    echo "🔄 Verificando assets do Vite..."
+    if [ ! -f "public/build/manifest.json" ]; then
+        echo "⚠️ Manifesto Vite não encontrado. Execute manualmente:"
+        echo "docker compose exec vite npm run build"
+    fi
+fi
 exec php-fpm
