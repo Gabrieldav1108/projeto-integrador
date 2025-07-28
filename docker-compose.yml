@@ -6,6 +6,8 @@ services:
     container_name: laravel-app
     volumes:
       - .:/var/www
+      - /var/www/vendor 
+      - /var/www/node_modules
     environment:
       - APP_ENV=local
     networks:
@@ -15,7 +17,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-      start_period: 30s  
+      start_period: 50s  
 
   vite:
     image: node:18
