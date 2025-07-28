@@ -1,7 +1,11 @@
 #!/bin/sh
-
 until nc -z laravel-app 9000; do
-  sleep 2
+  echo "Waiting for PHP-FPM..."
+  sleep 1
 done
-
-exec nginx -g 'daemon off;'
+exec "$@"#!/bin/sh
+until nc -z laravel-app 9000; do
+  echo "Waiting for PHP-FPM..."
+  sleep 1
+done
+exec "$@"

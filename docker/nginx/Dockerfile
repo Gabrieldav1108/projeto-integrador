@@ -1,7 +1,5 @@
 FROM nginx:alpine
-
-COPY default.conf /etc/nginx/conf.d/default.conf
-COPY wait-for-app.sh /wait-for-app.sh
-RUN chmod +x /wait-for-app.sh
-
-ENTRYPOINT ["/wait-for-app.sh"]
+COPY default.conf /etc/nginx/conf.d/
+COPY wait-for-app.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/wait-for-app.sh
+CMD ["/usr/local/bin/wait-for-app.sh", "nginx", "-g", "daemon off;"]
