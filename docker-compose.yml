@@ -15,7 +15,9 @@ services:
         condition: service_started
 
   vite:
-    image: node:18
+    build:
+      context: .
+      dockerfile: Dockerfile.vite
     container_name: laravel-vite
     working_dir: /var/www
     volumes:
@@ -23,12 +25,17 @@ services:
       - vite_node_modules:/var/www/node_modules
     ports:
       - "5173:5173"
+      - "24678:24678" # Porta do HMR
     environment:
       - APP_ENV=local
-    command: >
-      sh -c "npm install && npm run dev -- --host"
+      - VITE_APP_URL=http://localhost
     networks:
       - laravel_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5173"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   nginx:
     image: nginx:alpine
@@ -45,7 +52,7 @@ services:
       - laravel_network
 
 volumes:
-  vite_node_modules:
+  vite_node_modules:  # Volume corretamente declarado
 
 networks:
   laravel_network:

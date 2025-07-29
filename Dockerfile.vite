@@ -1,0 +1,19 @@
+FROM node:18
+
+WORKDIR /var/www
+
+# Instala o Vite e as dependências globais necessárias
+RUN npm install -g vite && \
+    npm install -g laravel-vite-plugin
+
+# Copia os arquivos de dependências primeiro para melhor cache
+COPY package.json package-lock.json ./
+
+# Instala as dependências do projeto
+RUN npm install
+
+# Copia o resto da aplicação
+COPY . .
+
+# Comando para desenvolvimento (build + hot-reload)
+CMD ["sh", "-c", "npm run build && npm run dev -- --host"]
