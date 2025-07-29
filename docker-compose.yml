@@ -14,47 +14,40 @@ services:
     environment:
       - APP_ENV=local
       - COMPOSER_MEMORY_LIMIT=-1
+      - HOST_UID=${UID:-1000}
+      - HOST_GID=${GID:-1000}
     user: "${UID:-1000}:${GID:-1000}"
     networks:
       - laravel_network
-    expose:  # 👈 Add this to expose port 9000 for PHP-FPM
+    expose:
       - "9000"
-    healthcheck:  # 👈 Healthcheck configuration
+    healthcheck:
       test: ["CMD-SHELL", "fcgi-ping localhost:9000 || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 3
-      start_period: 60s  
-    command: >
-      sh -c "
-      mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache &&
-      composer install --no-interaction --prefer-dist --optimize-autoloader &&
-      ([ -f .env ] || (cp .env.example .env && php artisan key:generate --ansi)) &&
-      php artisan config:clear &&
-      php artisan view:clear &&
-      php artisan route:clear &&
-      php artisan cache:clear &&
-      php artisan storage:link &&
-      php-fpm -F -R -y /usr/local/etc/php-fpm.conf  # 👈 Explicitly specify PHP-FPM config
-      "
+      start_period: 60s
 
   vite:
     image: node:18
     container_name: laravel-vite
     working_dir: /var/www
     volumes:
-      - node_modules_data:/var/www/node_modules
+      - .:/var/www
+      - /var/www/node_modules
     ports:
       - "5173:5173"
+      - "24678:24678"  # Porta do HMR
     environment:
       - APP_ENV=local
+      - VITE_APP_URL=http://localhost:5173
     command: >
       sh -c "
       npm install &&
       npm run dev -- --host
       "
-    depends_on:
-      - app
+    networks:
+      - laravel_network
 
   nginx:
     image: nginx:alpine

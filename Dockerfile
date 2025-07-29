@@ -25,9 +25,35 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN groupadd -g ${GID} laravel && \
     useradd -u ${UID} -g laravel -m laravel
 
+# Create permission fix script
+RUN echo '#!/bin/bash\n\
+set -e\n\
+echo "🔧 Applying automatic permission fixes..."\n\
+\n\
+# Use host UID/GID from environment or defaults\n\
+HOST_UID=${HOST_UID:-1000}\n\
+HOST_GID=${HOST_GID:-1000}\n\
+\n\
+# Apply permissions to critical directories\n\
+for dir in storage bootstrap/cache; do\n\
+    if [ -d "/var/www/$dir" ]; then\n\
+        chown -R laravel:laravel "/var/www/$dir" || true\n\
+        chmod -R 775 "/var/www/$dir" || true\n\
+    fi\n\
+done\n\
+\n\
+# Special handling for .env\n\
+[ -f "/var/www/.env" ] && chmod 664 "/var/www/.env" || true\n\
+\n\
+echo "✅ Automatic permission fixes applied"' > /usr/local/bin/fix-permissions && \
+    chmod +x /usr/local/bin/fix-permissions
+
 WORKDIR /var/www
 
-# Copy application files
-COPY --chown=laravel:laravel . .
-
 USER laravel
+
+# Entrypoint script
+COPY --chown=laravel:laravel entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["entrypoint.sh"]

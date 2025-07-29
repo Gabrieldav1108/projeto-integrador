@@ -3,33 +3,17 @@ set -e
 
 echo "🚀 Starting Laravel Auto-Setup..."
 
-# 1. Load environment variables
-export COMPOSER_ALLOW_SUPERUSER=1
+# Run permission fix
+fix-permissions
 
-# 2. Create required directory structure first
+# 1. Create required directory structure
 echo "📂 Ensuring directory structure..."
 mkdir -p \
     storage/framework/{cache,sessions,views} \
     storage/logs \
     bootstrap/cache
 
-# 3. Automatic permission synchronization
-echo "🔧 Synchronizing permissions..."
-HOST_UID=${HOST_UID:-1000}
-HOST_GID=${HOST_GID:-1000}
-
-# Apply safe permissions (only to Laravel-required directories)
-for dir in storage bootstrap/cache; do
-    if [ -d "/var/www/$dir" ]; then
-        chown -R $HOST_UID:$HOST_GID "/var/www/$dir" || true
-        chmod -R 775 "/var/www/$dir" || true
-    fi
-done
-
-# Special handling for .env
-[ -f "/var/www/.env" ] && chmod 664 "/var/www/.env" || true
-
-# 4. Dependency installation with retry logic
+# 2. Dependency installation with retry logic
 install_dependencies() {
     local max_retries=3
     local attempt=0
@@ -57,27 +41,29 @@ if [ ! -d "vendor" ] || [ ! -f "vendor/autoload.php" ]; then
     }
 fi
 
-# 5. Environment configuration
+# 3. Environment configuration
 if [ ! -f ".env" ]; then
     echo "⚙️ Initializing environment..."
     cp .env.example .env
     php artisan key:generate --ansi
 fi
 
-# 6. Application optimization
+# 4. Application optimization
 echo "⚡ Optimizing application..."
 php artisan config:clear
 php artisan view:clear
 php artisan route:clear
 php artisan cache:clear
-php artisan storage:link
 
-# 7. Final permission check
-echo "🔍 Verifying permissions..."
-[ -w storage ] || chmod 775 storage
-[ -w bootstrap/cache ] || chmod 775 bootstrap/cache
+# Only create storage link if it doesn't exist
+if [ ! -L "public/storage" ]; then
+    php artisan storage:link
+fi
 
-# 8. Health check before starting
+# Final permission check
+fix-permissions
+
+# 5. Health check before starting
 if [ -f "vendor/autoload.php" ] && [ -w storage ] && [ -w bootstrap/cache ]; then
     echo "✅ System ready! Starting PHP-FPM..."
     exec php-fpm -F -R
