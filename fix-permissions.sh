@@ -3,7 +3,6 @@ set -e
 
 echo "🔧 Applying permission fixes on host..."
 
-# Use host UID/GID
 HOST_UID=$(id -u)
 HOST_GID=$(id -g)
 
