@@ -3,26 +3,31 @@ set -e
 
 echo "🚀 Starting Laravel Setup..."
 
-# Create required directories
-mkdir -p \
-    storage/framework/{cache,sessions,views} \
-    storage/logs \
-    bootstrap/cache
+# Verifique e instale dependências se necessário
+if [ ! -d "vendor" ] || [ ! -f "vendor/autoload.php" ]; then
+    echo "📦 Installing dependencies..."
+    composer install --no-interaction --prefer-dist --optimize-autoloader
+fi
 
-# Set permissions
+# Configure o ambiente
+if [ ! -f ".env" ]; then
+    echo "⚙️ Initializing environment..."
+    cp .env.example .env
+    php artisan key:generate --ansi
+fi
+
+# Configure permissões
+echo "🔧 Setting permissions..."
 chmod -R 775 storage bootstrap/cache
 [ -f ".env" ] && chmod 664 .env
 
-# Create storage link if not exists
-if [ ! -L "public/storage" ]; then
-    php artisan storage:link
-fi
-
-# Optimize application
+# Execute os scripts do Laravel
+echo "🛠️ Running Laravel optimizations..."
 php artisan config:clear
 php artisan view:clear
 php artisan route:clear
 php artisan cache:clear
+php artisan package:discover
 
 echo "✅ Laravel is ready!"
 exec php-fpm -F -R
