@@ -1,5 +1,8 @@
 FROM php:8.3-fpm
 
+ARG UID=1000
+ARG GID=1000
+
 # 1. Instale dependências do sistema
 RUN apt-get update && apt-get install -y \
     git curl zip unzip libpng-dev libonig-dev libxml2-dev \
@@ -12,15 +15,12 @@ RUN apt-get update && apt-get install -y \
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # 3. Configure usuário e permissões
-RUN groupadd -g 1000 laravel && \
-    useradd -u 1000 -g laravel -m laravel && \
-    mkdir -p /var/www && \
-    chown -R laravel:laravel /var/www
+RUN groupadd -g $GID laravel || true && \
+    useradd -u $UID -g $GID -m laravel || true && \
+    mkdir -p /var/www/vendor && \
+    chown -R $UID:$GID /var/www
 
-# 4. Configure o Git para permitir o diretório
-RUN git config --global --add safe.directory /var/www
-
-# 5. Configure o PHP-FPM
+# 4. Configure o PHP-FPM
 RUN sed -i \
     -e 's/listen = .*/listen = 9000/' \
     -e 's/user = www-data/user = laravel/' \
@@ -29,21 +29,23 @@ RUN sed -i \
 
 WORKDIR /var/www
 
-# 6. Copie os arquivos do composer primeiro
-COPY --chown=laravel:laravel composer.json composer.lock ./
+# 5. Copie os arquivos do composer primeiro
+COPY --chown=${UID}:${GID} composer.json composer.lock ./
 
-# 7. Instale dependências como usuário laravel
-USER laravel
+# 6. Instale dependências como root (durante o build)
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-scripts
 
-# 8. Copie o resto da aplicação
-COPY --chown=laravel:laravel . .
+# 7. Ajuste as permissões novamente
+RUN chown -R ${UID}:${GID} /var/www/vendor
 
-# 9. Execute apenas o dump-autoload (removemos o run-script)
-RUN composer dump-autoload --optimize
+# 8. Mude para o usuário laravel
+USER laravel
+
+# 9. Copie o resto da aplicação
+COPY --chown=${UID}:${GID} . .
 
 # 10. Configure entrypoint
-COPY --chown=laravel:laravel entrypoint.sh /usr/local/bin/
+COPY --chown=${UID}:${GID} entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 ENTRYPOINT ["entrypoint.sh"]

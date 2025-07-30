@@ -1,9 +1,12 @@
-version: '3.8'
-
 services:
   app:
-    build: .
+    build: 
+      context: .
+      args:
+        - UID=${UID:-1000}
+        - GID=${GID:-1000}
     container_name: laravel-app
+    user: "${UID:-1000}:${GID:-1000}"
     volumes:
       - .:/var/www
     environment:
@@ -12,30 +15,35 @@ services:
       - laravel_network
     depends_on:
       vite:
-        condition: service_started
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
 
   vite:
     build:
       context: .
       dockerfile: Dockerfile.vite
     container_name: laravel-vite
+    user: "${UID:-1000}:${GID:-1000}"
     working_dir: /var/www
     volumes:
-      - .:/var/www
+      - ./:/var/www
       - vite_node_modules:/var/www/node_modules
-    ports:
-      - "5173:5173"
-      - "24678:24678" # Porta do HMR
     environment:
       - APP_ENV=local
       - VITE_APP_URL=http://localhost
-    networks:
-      - laravel_network
+    ports:
+      - "5173:5173"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5173"]
+      test: ["CMD-SHELL", "curl -f http://localhost:5173 || [ -f public/hot ] || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 5
+      start_period: 20s
 
   nginx:
     image: nginx:alpine
@@ -52,7 +60,7 @@ services:
       - laravel_network
 
 volumes:
-  vite_node_modules:  # Volume corretamente declarado
+  vite_node_modules:
 
 networks:
   laravel_network:

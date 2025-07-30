@@ -3,29 +3,34 @@ set -e
 
 echo "🚀 Starting Laravel Setup..."
 
-# Verifica se o container do Vite está saudável
-if ! curl -s http://vite:5173 >/dev/null; then
-    echo "⚠️ Vite container not responding! Assets may not be available."
-    echo "ℹ️ Run 'docker-compose up vite' in another terminal if needed"
+# Configura permissões compartilhadas
+echo "🔧 Setting shared permissions..."
+mkdir -p storage/framework/{cache,sessions,views}
+
+# Corrige especificamente o diretório public/hot
+if [ -d "public/hot" ]; then
+    echo "🛠 Fixing public/hot directory..."
+    rm -rf public/hot
+fi
+touch public/hot
+chmod 775 public/hot
+chown ${UID:-1000}:${GID:-1000} public/hot
+
+[ -f ".env" ] || cp .env.example .env
+
+# Verifica e instala dependências se necessário (para desenvolvimento)
+if [ "$APP_ENV" != "production" ]; then
+    if [ ! -d "vendor" ] || [ ! -f "vendor/autoload.php" ]; then
+        echo "📦 Installing PHP dependencies..."
+        composer install --no-interaction --prefer-dist --optimize-autoloader
+    fi
 fi
 
-# Instala dependências do PHP se necessário
-if [ ! -d "vendor" ] || [ ! -f "vendor/autoload.php" ]; then
-    echo "📦 Installing PHP dependencies..."
-    composer install --no-interaction --prefer-dist --optimize-autoloader
-fi
-
-# Configuração do ambiente
-if [ ! -f ".env" ]; then
-    echo "⚙️ Initializing environment..."
-    cp .env.example .env
+# Gera chave de aplicação se necessário
+if [ -f ".env" ] && ! grep -q '^APP_KEY=base64' .env; then
+    echo "🔑 Generating application key..."
     php artisan key:generate --ansi
 fi
-
-# Configura permissões
-echo "🔧 Setting permissions..."
-chmod -R 775 storage bootstrap/cache
-[ -f ".env" ] && chmod 664 .env
 
 # Otimiza a aplicação
 echo "⚡ Optimizing application..."
