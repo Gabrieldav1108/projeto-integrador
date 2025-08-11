@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    @vite(['resources/scss/app.scss', 'resources/js/app.js'])
-    <title>Home</title>
-</head>
-    {{-- navbar --}}
+<x-app-layout>
+    @slot('title', 'Home')
+    
+    {{-- navbar --}}    
     <x-header/>
 
     <section class="container p-3 mt-5 rounded-4" style="background-color: #cfe2ff">
@@ -71,6 +66,4 @@
                 </div>
             </div>
     </section>
-    
-</body>
-</html>
+</x-app-layout>
