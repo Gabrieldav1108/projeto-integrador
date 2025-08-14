@@ -18,6 +18,16 @@
             </div>
 
             <div class="mb-3">
+                <label for="age" class="form-label">Idade</label>
+                <input type="number" name="age" id="age" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" name="password" id="password" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
                 <label for="class_id" class="form-label">Turma</label>
                 <select name="class_id" id="class_id" class="form-select" required>
                     <option value="">Selecione...</option>

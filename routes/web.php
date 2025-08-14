@@ -11,7 +11,7 @@ Route::get("/homeAdmin", function () {
 })->name('homeAdmin');
 
 Route::get("/manageTeachers", function () {
-    return view("admin.teachers.index");
+    return view("admin.teachers.manage");
 })->name('manageTeachers');
 
 Route::get("/createTeacher", function () {

@@ -21,8 +21,8 @@
             <!-- Subject -->
             <div class="mb-3">
                 <label for="subject" class="form-label">Matéria</label>
-                <select name="classes[]" id="classes" class="form-select" multiple size="1" onclick="this.size=5" onblur="this.size=1" style="transition: all 0.2s;">
-                    <option value="class1">Materia 1</option>
+                <select name="classes[]" id="classes" class="form-select" style="transition: all 0.2s;">
+                    <option value="class1" selected>Materia 1</option>
                     <option value="class2">Materia 2</option>
                     <option value="class3">Materia 3</option>
                 </select>            
@@ -31,8 +31,8 @@
             <!-- Classes -->
             <div class="mb-3">
                 <label for="classes" class="form-label">Turmas</label>
-                <select name="classes[]" id="classes" class="form-select" multiple size="1" onclick="this.size=5" onblur="this.size=1" style="transition: all 0.2s;">
-                    <option value="class1">Class 1</option>
+                <select name="classes[]" id="classes" class="form-select" style="transition: all 0.2s;">
+                    <option value="class1" selected>Class 1</option>
                     <option value="class2">Class 2</option>
                     <option value="class3">Class 3</option>
                 </select>
@@ -42,7 +42,7 @@
             <!-- Schedules -->
             <div class="mb-3">
                 <label for="schedules" class="form-label">Hórarios da turma</label>
-                <select name="schedules[]" id="schedules" class="form-select" multiple size="1" onclick="this.size=6" onblur="this.size=1">
+                <select name="schedules[]" id="schedules" class="form-select">
                     <option value="monday-08-10">Monday 08:00-10:00</option>
                     <option value="monday-10-12">Monday 10:00-12:00</option>
                     <option value="wednesday-13-15">Wednesday 13:00-15:00</option>
