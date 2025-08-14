@@ -34,6 +34,18 @@ Route::get("/editClass", function () {
     return view("admin.classes.edit");
 })->name('editClass');
 
+Route::get("/manageStudent", function () {
+    return view("admin.students.manage");
+})->name('manageStudents');
+
+Route::get("/createStudent", function () {
+    return view("admin.students.create");
+})->name('createStudent');
+
+Route::get("/editStudent", function () {
+    return view("admin.students.edit");
+})->name('editStudent');
+
 //teacher
 Route::get('/home', function(){
     return view('teacher.home');
