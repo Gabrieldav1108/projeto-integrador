@@ -4,6 +4,25 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
+
+//--------------------adm-------------
+Route::get("/homeAdmin", function () {
+    return view("admin.home");
+})->name('homeAdmin');
+
+Route::get("/manageTeachers", function () {
+    return view("admin.teachers.index");
+})->name('manageTeachers');
+
+Route::get("/createTeacher", function () {
+    return view("admin.teachers.create");
+})->name('createTeacher');
+
+Route::get("/editTeacher", function () {
+    return view("admin.teachers.edit");
+})->name('editTeacher');
+
+
 //teacher
 Route::get('/home', function(){
     return view('teacher.home');
