@@ -22,6 +22,17 @@ Route::get("/editTeacher", function () {
     return view("admin.teachers.edit");
 })->name('editTeacher');
 
+Route::get("/manageClasses", function () {
+    return view("admin.classes.manage");
+})->name('manageClasses');
+
+Route::get("/createClass", function () {
+    return view("admin.classes.create");
+})->name('createClass');
+
+Route::get("/editClass", function () {
+    return view("admin.classes.edit");
+})->name('editClass');
 
 //teacher
 Route::get('/home', function(){

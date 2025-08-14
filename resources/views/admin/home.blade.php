@@ -15,14 +15,14 @@
                 <div class="p-4 border rounded text-center border-black border-2 shadow" style="background-color: #e0efff">
                     <h5 class="fw-bold">Gerenciar Alunos</h5>
                     <p>Adicionar, editar ou excluir alunos.</p>
-                    <a href="#" class="btn btn-primary fw-bold">Acessar</a>
+                    <a href="{{route('manageClasses')}}" class="btn btn-primary fw-bold">Acessar</a>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="p-4 border rounded text-center border-black border-2 shadow" style="background-color: #e0efff">
                     <h5 class="fw-bold">Gerenciar Turmas</h5>
                     <p>Criar, editar ou excluir turmas.</p>
-                    <a href="#" class="btn btn-primary fw-bold">Acessar</a>
+                    <a href="{{route('manageClasses')}}" class="btn btn-primary fw-bold">Acessar</a>
                 </div>
             </div>
         </div>
