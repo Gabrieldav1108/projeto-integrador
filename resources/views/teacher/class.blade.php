@@ -62,6 +62,4 @@
                 </div>
             </div>
         </section>
-    
-    {{-- navbar --}}
 </x-app-layout>

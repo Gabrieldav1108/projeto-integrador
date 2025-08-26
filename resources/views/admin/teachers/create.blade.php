@@ -17,12 +17,17 @@
                 <label for="email" class="form-label">E-mail</label>
                 <input type="email" name="email" id="email" class="form-control" required>
             </div>
+            
+            <div class="mb-3">
+                <label for="password" class="form-label">Senha</label>
+                <input type="password" name="password" id="password" class="form-control" required>
+            </div>
 
             <!-- Subject -->
             <div class="mb-3">
                 <label for="subject" class="form-label">Matéria</label>
                 <select name="classes[]" id="classes" class="form-select" style="transition: all 0.2s;">
-                    <option value="class1" selected>Materia 1</option>
+                    <option value="class1">Materia 1</option>
                     <option value="class2">Materia 2</option>
                     <option value="class3">Materia 3</option>
                 </select>            
@@ -32,23 +37,23 @@
             <div class="mb-3">
                 <label for="classes" class="form-label">Turmas</label>
                 <select name="classes[]" id="classes" class="form-select" style="transition: all 0.2s;">
-                    <option value="class1" selected>Class 1</option>
-                    <option value="class2">Class 2</option>
-                    <option value="class3">Class 3</option>
+                    <option value="class1">Turma 1</option>
+                    <option value="class2">Turma 2</option>
+                    <option value="class3">Turma 3</option>
                 </select>
-                <small class="text-muted">Pressione CTRL (ou Command ou Mac) para selecionar vários.</small>
+                <small class="text-muted">Pressione CTRL (ou Command em Mac) para selecionar vários.</small>
             </div>
 
             <!-- Schedules -->
             <div class="mb-3">
                 <label for="schedules" class="form-label">Hórarios da turma</label>
                 <select name="schedules[]" id="schedules" class="form-select">
-                    <option value="monday-08-10">Monday 08:00-10:00</option>
-                    <option value="monday-10-12">Monday 10:00-12:00</option>
-                    <option value="wednesday-13-15">Wednesday 13:00-15:00</option>
-                    <option value="wednesday-15-17">Wednesday 15:00-17:00</option>
-                    <option value="friday-08-10">Friday 08:00-10:00</option>
-                    <option value="friday-10-12">Friday 10:00-12:00</option>
+                    <option value="monday-08-10">Segunda-feira 08:00-10:00</option>
+                    <option value="monday-10-12">Terça-Feira 10:00-12:00</option>
+                    <option value="wednesday-13-15">Quarta-feira 13:00-15:00</option>
+                    <option value="wednesday-15-17">Quarta-feira 15:00-17:00</option>
+                    <option value="friday-08-10">Sexta-feira 08:00-10:00</option>
+                    <option value="friday-10-12">Sexta-feira 10:00-12:00</option>
                 </select>
                 <small class="text-muted">Clique para expandir e selecionar horários</small>
             </div>

@@ -53,7 +53,6 @@
             <div>
               <h5 class="fw-bold mb-3 text-center">Minhas Estatísticas</h5>
               <p><strong>Turmas:</strong> 8</p>
-              <p><strong>Formações:</strong> ???</p>
               <p><strong>Horários:</strong> <a href="{{'schedules' }}">Ver horários</a></p>
             </div>
             <div class="text-center mt-3">

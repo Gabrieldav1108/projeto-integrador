@@ -23,7 +23,7 @@
                     <tr>
                         <td>Maria Souza</td>
                         <td>maria@escola.com</td>
-                        <td>15aria@escola.com</td>
+                        <td>17</td>
                         <td>Turma A</td>
                         <td class="text-center">
                             <a href="{{ route('editStudent', 1) }}" class="btn btn-warning btn-sm">Editar</a>

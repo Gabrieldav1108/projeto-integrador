@@ -14,6 +14,7 @@
                     <tr>
                         <th>Nome</th>
                         <th>Email</th>
+                        <th>Turmas</th>
                         <th>Matéria</th>
                         <th class="text-center">Ações</th>
                     </tr>
@@ -22,6 +23,7 @@
                     <tr>
                         <td>João Silva</td>
                         <td>joao@escola.com</td>
+                        <td>Turma 1, Turma 2</td>
                         <td>Matemática</td>
                         <td class="text-center">
                             <a href="{{ route('editTeacher', 1) }}" class="btn btn-warning btn-sm">Editar</a>

@@ -11,20 +11,28 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <!-- Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/scss/app.scss', 'resources/js/app.js'])
 </head>
-<body class="font-sans text-gray-900 antialiased bg-[#cfe2ff]">
-    <div class="min-h-screen flex flex-col justify-center items-center pt-6 sm:pt-0">
+<body class="bg-light">
+    <div class="min-vh-100 d-flex flex-column justify-content-center align-items-center">
         <div class="mb-4">
             <a href="/">
-                <x-application-logo class="w-20 h-20 fill-current text-blue-600" />
+                <x-application-logo class="w-20 h-20 text-primary" />
             </a>
         </div>
 
-        <div class="w-full max-w-md px-6 py-6 bg-white rounded-3xl shadow-md border border-gray-300">
-            {{ $slot }}
+        <div class="card shadow border-0 rounded-4" style="max-width: 420px; width: 100%;">
+            <div class="card-body p-4">
+                {{ $slot }}
+            </div>
         </div>
     </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

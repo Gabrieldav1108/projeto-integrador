@@ -14,7 +14,7 @@
                     <tr>
                         <th>Nome</th>
                         <th>Número da turma</th>
-                        <th>Professor</th>
+                        <th>Professores</th>
                         <th class="text-center">Ações</th>
                     </tr>
                 </thead>
@@ -22,7 +22,7 @@
                     <tr>
                         <td>Turma A</td>
                         <td>901</td>
-                        <td>Marco</td>
+                        <td>Professor 1, Professor 2</td>
                         <td class="text-center">
                             <a href="{{ route('editClass', 1) }}" class="btn btn-warning btn-sm">Editar</a>
                             <form action="{{-- {{ route('classes.destroy', 1) }} --}}#" method="POST" class="d-inline">
