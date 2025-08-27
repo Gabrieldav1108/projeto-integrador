@@ -1,8 +1,8 @@
 <x-app-layout>
-    @slot('title', 'Turma')
+    @slot('title', 'Turma - {{ $class->name }}')
         <x-header/>
         <section class="container p-4 mt-5 rounded-4" style="background-color: #cfe2ff">
-            <h2>Informações da turma</h2>
+            <h2>Informações da turma: {{$classes->name}}</h2>
             <div class="row rounded p-4 align-items-stretch">
                 
                 <!-- Alunos matriculados -->

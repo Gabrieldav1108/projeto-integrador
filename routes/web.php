@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -46,10 +47,11 @@ Route::get("/editStudent", function () {
     return view("admin.students.edit");
 })->name('editStudent');
 
+
+
 //teacher
-Route::get('/home', function(){
-    return view('teacher.home');
-})->name('homeTeacher');
+Route::get('/home', [HomeController::class, 'index'])->name('homeTeacher');
+
 
 Route::get('/addClassInformation', function(){
     return view('teacher.addClassInformation');
