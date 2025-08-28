@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\ClassInformation as ControllersClassInformation;
+use App\Http\Controllers\ClassInformationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
+use App\Models\ClassInformation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -51,19 +54,28 @@ Route::get("/editStudent", function () {
 
 //teacher
 Route::get('/home', [HomeController::class, 'index'])->name('homeTeacher');
+Route::prefix('class/{classId}')->group(function () {
+    Route::get('/informations', [ClassInformationController::class, 'index'])
+        ->name('class.informations');
 
-
-Route::get('/addClassInformation', function(){
-    return view('teacher.addClassInformation');
-})->name('addClassInformation');
-
-Route::get('/editClassInformation', function(){
-    return view('teacher.editClassInformation');
-})->name('editClassInformation');
-
-Route::get('class', function(){
-    return view('teacher.class');
-})->name('class');
+    Route::get('/information', [ClassInformationController::class, 'show'])
+        ->name('class.information.show');
+        
+    Route::get('/information/add', [ClassInformationController::class, 'create'])
+        ->name('class.information.add');
+        
+    Route::post('/information', [ClassInformationController::class, 'store'])
+        ->name('class.information.store');
+        
+    Route::get('/information/{id}/edit', [ClassInformationController::class, 'edit'])
+        ->name('class.information.edit');
+        
+    Route::put('/information/{id}', [ClassInformationController::class, 'update'])
+        ->name('class.information.update');
+        
+    Route::delete('/information/{id}', [ClassInformationController::class, 'destroy'])
+        ->name('class.information.destroy');
+});
 
 Route::get('/studentInformation', function(){
     return view('teacher.studentInformation');
