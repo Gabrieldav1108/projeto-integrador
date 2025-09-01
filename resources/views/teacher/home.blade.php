@@ -12,7 +12,7 @@
                 <div class="col-md-3 mb-4">
                     <div class="p-3 border rounded text-center border-black border-2 shadow" style="background-color: #e0efff" >
                         <h5 class="fw-bold">{{$class->name}}</h5>
-                        <p>{{$class->numbeClass}}</p>
+                        <p>N° da turma: {{$class->numberClass}}</p>
                         <a class="btn btn-primary fw-bold" href={{route('class.informations', $class->id)}}>Ver turma</a>
                     </div>
                 </div>

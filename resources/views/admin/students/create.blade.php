@@ -4,7 +4,16 @@
     
     <section class="container p-4 mt-5 rounded-4" style="background-color: #cfe2ff">
         <h2 class="fw-bold mb-4">Adicionar Aluno</h2>
-        <form action="{{-- {{ route('students.store') }} --}}#" method="POST">
+        @if($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+        <form action="{{ route('student.store') }}" method="POST">
             @csrf
 
             <div class="mb-3">
@@ -30,9 +39,9 @@
             <div class="mb-3">
                 <label for="class_id" class="form-label">Turma</label>
                 <select name="class_id" id="class_id" class="form-select" required>
-                    <option value="">Selecione...</option>
-                    <option value="1">Turma A</option>
-                    <option value="2">Turma B</option>
+                    @foreach ($schoolClasses as $class)
+                        <option value="{{ $class->id }}">{{ $class->name }}</option>
+                    @endforeach
                 </select>
             </div>
 
