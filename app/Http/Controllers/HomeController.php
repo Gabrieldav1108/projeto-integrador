@@ -7,10 +7,15 @@ use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
-        public function index()
+    public function indexSchoolClass()
     {
         $schoolClasses = SchoolClass::orderBy('name')->paginate(12);
         
         return view('teacher.home', compact('schoolClasses'));
+    }
+
+    public function indexAdmin()
+    {
+        return view('admin.home');
     }
 }

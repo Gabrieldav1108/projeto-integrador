@@ -1,66 +1,72 @@
 <x-app-layout>
-    @slot('title', 'Adicionar professor')
+    @slot('title', 'Adicionar Professor')
     <x-admin-header/>
+    
     <section class="container p-4 mt-5 rounded-4" style="background-color: #cfe2ff">
         <h2 class="fw-bold mb-4">Adicionar Professor</h2>
-        <form action="{{-- {{ route('admin.teachers.store') }} --}}#" method="POST">
+        
+        @if($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form action="{{ route('admin.teachers.store') }}" method="POST">
             @csrf
 
-            <!-- Name -->
-            <div class="mb-3">
-                <label for="name" class="form-label">Nome Completo</label>
-                <input type="text" name="name" id="name" class="form-control" required>
-            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <!-- Name -->
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nome Completo *</label>
+                        <input type="text" name="name" id="name" class="form-control" value="{{ old('name') }}" required>
+                    </div>
 
-            <!-- Email -->
-            <div class="mb-3">
-                <label for="email" class="form-label">E-mail</label>
-                <input type="email" name="email" id="email" class="form-control" required>
-            </div>
-            
-            <div class="mb-3">
-                <label for="password" class="form-label">Senha</label>
-                <input type="password" name="password" id="password" class="form-control" required>
-            </div>
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label for="email" class="form-label">E-mail *</label>
+                        <input type="email" name="email" id="email" class="form-control" value="{{ old('email') }}" required>
+                    </div>
+                    
+                    <!-- Password -->
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Senha *</label>
+                        <input type="password" name="password" id="password" class="form-control" required>
+                    </div>
+                </div>
 
-            <!-- Subject -->
-            <div class="mb-3">
-                <label for="subject" class="form-label">Matéria</label>
-                <select name="classes[]" id="classes" class="form-select" style="transition: all 0.2s;">
-                    <option value="class1">Materia 1</option>
-                    <option value="class2">Materia 2</option>
-                    <option value="class3">Materia 3</option>
-                </select>            
-            </div>
+                <div class="col-md-6">
+                    <!-- Specialty -->
+                    <div class="mb-3">
+                        <label for="specialty" class="form-label">Especialidade/Matéria</label>
+                        <input type="text" name="specialty" id="specialty" class="form-control" value="{{ old('specialty') }}" 
+                               placeholder="Ex: Matemática, Português, etc.">
+                    </div>
 
-            <!-- Classes -->
-            <div class="mb-3">
-                <label for="classes" class="form-label">Turmas</label>
-                <select name="classes[]" id="classes" class="form-select" style="transition: all 0.2s;">
-                    <option value="class1">Turma 1</option>
-                    <option value="class2">Turma 2</option>
-                    <option value="class3">Turma 3</option>
-                </select>
-                <small class="text-muted">Pressione CTRL (ou Command em Mac) para selecionar vários.</small>
-            </div>
+                    <!-- Phone -->
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Telefone</label>
+                        <input type="text" name="phone" id="phone" class="form-control" value="{{ old('phone') }}"
+                               placeholder="(00) 00000-0000">
+                    </div>
 
-            <!-- Schedules -->
-            <div class="mb-3">
-                <label for="schedules" class="form-label">Hórarios da turma</label>
-                <select name="schedules[]" id="schedules" class="form-select">
-                    <option value="monday-08-10">Segunda-feira 08:00-10:00</option>
-                    <option value="monday-10-12">Terça-Feira 10:00-12:00</option>
-                    <option value="wednesday-13-15">Quarta-feira 13:00-15:00</option>
-                    <option value="wednesday-15-17">Quarta-feira 15:00-17:00</option>
-                    <option value="friday-08-10">Sexta-feira 08:00-10:00</option>
-                    <option value="friday-10-12">Sexta-feira 10:00-12:00</option>
-                </select>
-                <small class="text-muted">Clique para expandir e selecionar horários</small>
+                    <!-- Hire Date -->
+                    <div class="mb-3">
+                        <label for="hire_date" class="form-label">Data de Contratação *</label>
+                        <input type="date" name="hire_date" id="hire_date" class="form-control" value="{{ old('hire_date') }}" required>
+                    </div>
+                </div>
             </div>
 
             <!-- Buttons -->
-            <button type="submit" class="btn btn-primary fw-bold">Salvar</button>
-            <a href="{{ route('manageTeachers') }}" class="btn btn-secondary">Cancelar</a>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary fw-bold">Salvar</button>
+                <a href="{{ route('admin.teachers.manage') }}" class="btn btn-secondary">Cancelar</a>
+            </div>
         </form>
     </section>
 </x-app-layout>

@@ -5,15 +5,16 @@ use App\Http\Controllers\ClassInformationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\TeacherController;
 use App\Models\ClassInformation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 
 //--------------------adm-------------
-
+Route::get('/homeAdmin', [HomeController::class, 'indexAdmin'])->name('homeAdmin');
 Route::prefix('admin')->group(function() {
-    Route::get('home', [StudentController::class, 'index'])->name('admin.index');
+    Route::get('manageStudent', [StudentController::class, 'index'])->name('admin.index');
     Route::get("createStudent", [StudentController::class, 'create'])->name('student.add');
     Route::get("editStudent/{id}", [StudentController::class, 'edit'])->name('student.edit');
     Route::post("storeStudent", [StudentController::class, 'store'])->name('student.store');
@@ -26,13 +27,16 @@ Route::get("/manageTeachers", function () {
     return view("admin.teachers.manage");
 })->name('manageTeachers');
 
-Route::get("/createTeacher", function () {
-    return view("admin.teachers.create");
-})->name('createTeacher');
 
-Route::get("/editTeacher", function () {
-    return view("admin.teachers.edit");
-})->name('editTeacher');
+// Rotas para Teachers
+Route::prefix('admin')->group(function() {
+    Route::get('teachers', [TeacherController::class, 'index'])->name('admin.teachers.manage');
+    Route::get('teachers/create', [TeacherController::class, 'create'])->name('admin.teachers.create');
+    Route::post('teachers', [TeacherController::class, 'store'])->name('admin.teachers.store');
+    Route::get('teachers/{teacher}/edit', [TeacherController::class, 'edit'])->name('admin.teachers.edit');
+    Route::put('teachers/{teacher}', [TeacherController::class, 'update'])->name('admin.teachers.update');
+    Route::delete('teachers/{teacher}', [TeacherController::class, 'destroy'])->name('admin.teachers.destroy');
+});
 
 Route::get("/manageClasses", function () {
     return view("admin.classes.manage");
@@ -46,18 +50,13 @@ Route::get("/editClass", function () {
     return view("admin.classes.edit");
 })->name('editClass');
 
-Route::get("/manageStudent", function () {
-    return view("admin.students.manage");
-})->name('manageStudents');
 
-Route::get("/editStudent", function () {
-    return view("admin.students.edit");
-})->name('editStudent');
+
 
 
 
 //teacher
-Route::get('/home', [HomeController::class, 'index'])->name('homeTeacher');
+Route::get('/home', [HomeController::class, 'indexSchoolClass'])->name('homeTeacher');
 Route::prefix('class/{classId}')->group(function () {
     Route::get('/informations', [ClassInformationController::class, 'index'])
         ->name('class.informations');

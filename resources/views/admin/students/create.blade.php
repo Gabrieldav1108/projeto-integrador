@@ -46,7 +46,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary fw-bold">Salvar</button>
-            <a href="{{ route('manageStudents') }}" class="btn btn-secondary">Cancelar</a>
+            <a href="{{ route('admin.index') }}" class="btn btn-secondary">Cancelar</a>
         </form>
     </section>
 </x-app-layout>
