@@ -18,10 +18,47 @@
                 </div>
             @endforeach
         </div>
-        @if($schoolClasses->hasPages())
-            <div class="d-flex justify-content-center mt-4">
-                {{ $schoolClasses->links() }}
-            </div>
-        @endif
+            @if($schoolClasses->hasPages())
+                <div class="d-flex justify-content-center mt-4">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination">
+                            {{-- Previous Page Link --}}
+                            @if($schoolClasses->onFirstPage())
+                                <li class="page-item disabled">
+                                    <span class="page-link">Anterior</span>
+                                </li>
+                            @else
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ $schoolClasses->previousPageUrl() }}" rel="prev">Anterior</a>
+                                </li>
+                            @endif
+
+                            {{-- Pagination Elements --}}
+                            @foreach($schoolClasses->getUrlRange(1, $schoolClasses->lastPage()) as $page => $url)
+                                @if($page == $schoolClasses->currentPage())
+                                    <li class="page-item active" aria-current="page">
+                                        <span class="page-link">{{ $page }}</span>
+                                    </li>
+                                @else
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                                    </li>
+                                @endif
+                            @endforeach
+
+                            {{-- Next Page Link --}}
+                            @if($schoolClasses->hasMorePages())
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ $schoolClasses->nextPageUrl() }}" rel="next">Próximo</a>
+                                </li>
+                            @else
+                                <li class="page-item disabled">
+                                    <span class="page-link">Próximo</span>
+                                </li>
+                            @endif
+                        </ul>
+                    </nav>
+                </div>
+            @endif
     </section>
 </x-app-layout>

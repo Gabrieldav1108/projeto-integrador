@@ -24,11 +24,29 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
+        // Primeiro, tenta autenticar o usuário
         $request->authenticate();
 
+        // Regenera a sessão para prevenir fixation attacks
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // Agora pega o usuário autenticado
+        $user = Auth::user();
+
+        if (!$user) {
+            return redirect()->route('login')->withErrors([
+                'email' => 'Falha ao autenticar. Verifique suas credenciais.',
+            ]);
+        }
+
+        // Redireciona baseado no role
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.home');
+        } elseif ($user->role === 'teacher') {
+            return redirect()->route('teacher.home');
+        } else {
+            return redirect()->route('student.home');
+        }
     }
 
     /**
