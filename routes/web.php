@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\ClassController;
 use App\Http\Controllers\ClassInformation as ControllersClassInformation;
 use App\Http\Controllers\ClassInformationController;
 use App\Http\Controllers\HomeController;
@@ -29,17 +30,15 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function() {
     Route::put('teachers/{teacher}', [TeacherController::class, 'update'])->name('admin.teachers.update');
     Route::delete('teachers/{teacher}', [TeacherController::class, 'destroy'])->name('admin.teachers.destroy');
 
-    Route::get("/manageClasses", function () {
-        return view("admin.classes.manage");
-    })->name('manageClasses');
-
-    Route::get("/createClass", function () {
-        return view("admin.classes.create");
-    })->name('createClass');
-
-    Route::get("/editClass", function () {
-        return view("admin.classes.edit");
-    })->name('editClass');
+    Route::resource('classes', ClassController::class)->names([
+        'index'   => 'admin.classes.manage',
+        'create'  => 'admin.classes.create',
+        'store'   => 'admin.classes.store',
+        'edit'    => 'admin.classes.edit',
+        'update'  => 'admin.classes.update',
+        'destroy' => 'admin.classes.destroy',
+        'show'    => 'admin.classes.show',
+    ]);
 });
 
 //teacher

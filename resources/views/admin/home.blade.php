@@ -22,7 +22,7 @@
                 <div class="p-4 border rounded text-center border-black border-2 shadow" style="background-color: #e0efff">
                     <h5 class="fw-bold">Gerenciar Turmas</h5>
                     <p>Criar, editar ou excluir turmas.</p>
-                    <a href="{{route('manageClasses')}}" class="btn btn-primary fw-bold">Acessar</a>
+                    <a href="{{route('admin.classes.manage')}}" class="btn btn-primary fw-bold">Acessar</a>
                 </div>
             </div>
         </div>

@@ -29,4 +29,9 @@ class Teacher extends Model
         'is_active' => 'boolean'
     ];
 
+
+    public function schoolClasses()
+    {
+        return $this->belongsToMany(SchoolClass::class, 'class_teacher', 'teacher_id', 'class_id');
+    }
 }
