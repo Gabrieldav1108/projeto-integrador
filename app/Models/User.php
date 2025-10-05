@@ -5,38 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'email',
         'password',
         'role', 
+        'foto',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -44,6 +31,20 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function getFotoUrlAttribute()
+    {
+        if ($this->foto) {
+            // Verificar se a foto existe na pasta public/images/profiles
+            if (file_exists(public_path('images/profiles/' . $this->foto))) {
+                return asset('images/profiles/' . $this->foto);
+            }
+        }
+        
+        // Foto padrão caso não tenha
+        return asset('img/sukuna.jpg');
+    }
+
 
     /**
      * 🚦 Helpers para checar o papel do usuário
@@ -62,9 +63,36 @@ class User extends Authenticatable
     {
         return $this->role === 'student';
     }
+
+    /**
+     * Relacionamento com turmas
+     */
     public function classes()
     {
         return $this->belongsToMany(SchoolClass::class, 'class_user', 'user_id', 'class_id');
     }
 
+    /**
+     * Escopo para professores
+     */
+    public function scopeTeachers($query)
+    {
+        return $query->where('role', 'teacher');
+    }
+
+    /**
+     * Escopo para estudantes
+     */
+    public function scopeStudents($query)
+    {
+        return $query->where('role', 'student');
+    }
+
+    /**
+     * Escopo para administradores
+     */
+    public function scopeAdmins($query)
+    {
+        return $query->where('role', 'admin');
+    }
 }

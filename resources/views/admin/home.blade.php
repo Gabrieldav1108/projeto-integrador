@@ -8,21 +8,21 @@
                 <div class="p-4 border rounded text-center border-black border-2 shadow" style="background-color: #e0efff">
                     <h5 class="fw-bold">Gerenciar Professores</h5>
                     <p>Adicionar, editar ou excluir professores.</p>
-                    <a href="{{route("admin.teachers.manage")}}" class="btn btn-primary fw-bold">Acessar</a>
+                    <a href="{{route("admin.teachers.index")}}" class="btn btn-primary fw-bold">Acessar</a>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="p-4 border rounded text-center border-black border-2 shadow" style="background-color: #e0efff">
                     <h5 class="fw-bold">Gerenciar Alunos</h5>
                     <p>Adicionar, editar ou excluir alunos.</p>
-                    <a href="{{route('admin.index')}}" class="btn btn-primary fw-bold">Acessar</a>
+                    <a href="{{route('admin.students.index')}}" class="btn btn-primary fw-bold">Acessar</a>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="p-4 border rounded text-center border-black border-2 shadow" style="background-color: #e0efff">
                     <h5 class="fw-bold">Gerenciar Turmas</h5>
                     <p>Criar, editar ou excluir turmas.</p>
-                    <a href="{{route('admin.classes.manage')}}" class="btn btn-primary fw-bold">Acessar</a>
+                    <a href="{{route('admin.classes.index')}}" class="btn btn-primary fw-bold">Acessar</a>
                 </div>
             </div>
         </div>

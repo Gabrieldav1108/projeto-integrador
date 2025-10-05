@@ -91,7 +91,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary fw-bold">Salvar</button>
-            <a href="{{ route('admin.classes.manage') }}" class="btn btn-secondary">Cancelar</a>
+            <a href="{{ route('admin.classes.index') }}" class="btn btn-secondary">Cancelar</a>
         </form>
     </section>
 

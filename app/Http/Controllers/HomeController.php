@@ -2,33 +2,50 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SchoolClass;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use App\Models\SchoolClass;
 
 class HomeController extends Controller
 {
     /**
-     * Página inicial do Admin
+     * Redireciona para a home baseada no role
      */
+    public function redirectToRoleBasedHome()
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.home');
+        } elseif ($user->role === 'teacher') {
+            return redirect()->route('teacher.home');
+        } elseif ($user->role === 'student') {
+            return redirect()->route('student.home');
+        }
+        
+        return redirect('/login');
+    }
+
     public function indexAdmin()
     {
         return view('admin.home');
     }
 
-    /**
-     * Página inicial do Teacher (corrigido o nome)
-     */
-    public function indexTeacher() // Ou mude para indexTeacher se preferir
+    public function indexTeacher()
     {
-        $schoolClasses = SchoolClass::paginate(8);
-        return view('teacher.home', compact('schoolClasses'));
+        return view('teacher.home');
     }
 
-    /**
-     * Página inicial do Student (se necessário)
-     */
     public function indexStudent()
     {
-        return view('student.home');
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        
+        // Carregar as turmas do estudante com informações do professor
+        $classes = $user->classes()->with('teacher')->get();
+        
+        return view('student.home', compact('classes'));
     }
 }

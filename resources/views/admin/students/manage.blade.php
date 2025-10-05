@@ -5,7 +5,7 @@
     <section class="container p-4 mt-5 rounded-4" style="background-color: #cfe2ff">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="fw-bold">Alunos</h2>
-            <a href="{{ route('student.add') }}" class="btn btn-success">+ Novo Aluno</a>
+            <a href="{{ route('admin.students.create') }}" class="btn btn-success">+ Novo Aluno</a>
         </div>
         
         @if($errors->any())
@@ -43,8 +43,8 @@
                         <td>{{ $student->age }}</td>
                         <td>{{ $student->schoolClass->name ?? 'N/A' }}</td>
                         <td class="text-center">
-                            <a href="{{ route('student.edit', $student->id) }}" class="btn btn-warning btn-sm">Editar</a>
-                            <form action="{{ route('student.destroy', $student->id) }}" method="POST" class="d-inline">
+                            <a href="{{ route('admin.students.edit', $student->id) }}" class="btn btn-warning btn-sm">Editar</a>
+                            <form action="{{ route('admin.students.destroy', $student->id) }}" method="POST" class="d-inline">
                                 @csrf 
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger btn-sm" 

@@ -9,9 +9,9 @@
                 </button>
                 <div class="collapse navbar-collapse justify-content-between px-lg-3" id="navbarCollapse">
                     <div class="navbar-nav mx-auto py-0">
-                        <a href={{route('bulletin')}} class="nav-item nav-link active">Boletim</a>
+                        <a href={{route('student.bulletin')}} class="nav-item nav-link active">Boletim</a>
                         <a href={{route('student.home')}} class="nav-item nav-link active">Minhas matérias</a>
-                        <a href={{route('studentSchedules')}} class="nav-item nav-link">Horários</a>
+                        <a href={{route('student.schedules.index')}} class="nav-item nav-link">Horários</a>
                         <a href={{route('profile')}} class="nav-item nav-link">Perfil</a>
                     </div>
                 </div>

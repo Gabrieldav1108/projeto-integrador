@@ -15,7 +15,7 @@
             </div>
         @endif
 
-        <form action="{{ route('student.update', $student->id) }}" method="POST">
+        <form action="{{ route('admin.students.update', $student->id) }}" method="POST">
             @csrf 
             @method('PUT')
 
@@ -51,7 +51,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary fw-bold">Salvar</button>
-            <a href="{{ route('manageStudents') }}" class="btn btn-secondary">Cancelar</a>
+            <a href="{{ route('admin.students.index') }}" class="btn btn-secondary">Cancelar</a>
         </form>
     </section>
 </x-app-layout>

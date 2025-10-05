@@ -39,7 +39,7 @@ class TeacherController extends Controller
             'hire_date' => $validated['hire_date'],
         ]);
 
-        return redirect()->route('admin.teachers.manage')->with('success', 'Professor criado com sucesso!');
+        return redirect()->route('admin.teachers.index')->with('success', 'Professor criado com sucesso!');
     }
 
     public function show(Teacher $teacher)
@@ -79,12 +79,12 @@ class TeacherController extends Controller
 
         $teacher->update($updateData);
 
-        return redirect()->route('admin.teachers.manage')->with('success', 'Professor atualizado com sucesso!');
+        return redirect()->route('admin.teachers.index')->with('success', 'Professor atualizado com sucesso!');
     }
 
     public function destroy(Teacher $teacher)
     {
         $teacher->delete();
-        return redirect()->route('admin.teachers.manage')->with('success', 'Professor excluído com sucesso!');
+        return redirect()->route('admin.teachers.index')->with('success', 'Professor excluído com sucesso!');
     }
 }

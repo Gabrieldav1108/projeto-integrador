@@ -13,7 +13,7 @@
                 </ul>
             </div>
         @endif
-        <form action="{{ route('student.store') }}" method="POST">
+        <form action="{{ route('admin.students.store') }}" method="POST">
             @csrf
 
             <div class="mb-3">
@@ -35,6 +35,10 @@
                 <label for="password" class="form-label">Senha</label>
                 <input type="password" name="password" id="password" class="form-control" required>
             </div>
+            <div class="mb-3">
+                <label for="password_confirmation" class="form-label">Confirmar Senha</label>
+                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
+            </div>
 
             <div class="mb-3">
                 <label for="class_id" class="form-label">Turma</label>
@@ -46,7 +50,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary fw-bold">Salvar</button>
-            <a href="{{ route('admin.index') }}" class="btn btn-secondary">Cancelar</a>
+            <a href="{{ route('admin.students.index') }}" class="btn btn-secondary">Cancelar</a>
         </form>
     </section>
 </x-app-layout>

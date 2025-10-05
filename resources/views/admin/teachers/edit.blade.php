@@ -74,7 +74,7 @@
             <!-- Buttons -->
             <div class="d-flex gap-2">
                 <button type="submit" class="btn btn-primary fw-bold">Atualizar</button>
-                <a href="{{ route('admin.teachers.manage') }}" class="btn btn-secondary">Cancelar</a>
+                <a href="{{ route('admin.teachers.index') }}" class="btn btn-secondary">Cancelar</a>
             </div>
         </form>
     </section>

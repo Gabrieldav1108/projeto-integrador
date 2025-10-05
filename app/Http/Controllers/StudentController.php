@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class StudentController extends Controller
 {
     public function index()
     {
         $students = Student::with('schoolClass')->get();
-
         return view('admin.students.manage', compact('students'));
     }
 
@@ -22,25 +22,33 @@ class StudentController extends Controller
     
     public function store(Request $request)
     {
-        // Validação dos dados recebidos do formulário
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:student',
+            'email' => 'required|string|email|max:255|unique:student', // ← Corrigido: unique:student
             'age' => 'required|integer|min:1|max:25',
-            'password' => 'required|string|min:6',
+            'password' => 'required|string|min:6|confirmed', // Adicionei confirmed
             'class_id' => 'required|exists:classes,id',
         ]);
 
-        Student::create([
+        // Criar usuário para login
+        $user = \App\Models\User::create([
+            'name' => $validatedData['name'],
+            'email' => $validatedData['email'],
+            'password' => Hash::make($validatedData['password']),
+            'role' => 'student',
+        ]);
+
+        // Criar estudante na tabela student
+        $student = Student::create([
             'name' => $validatedData['name'],
             'email' => $validatedData['email'],
             'age' => $validatedData['age'],
-            'password' => bcrypt($validatedData['password']),
+            'password' => Hash::make($validatedData['password']),
             'class_id' => $validatedData['class_id'],
+            'user_id' => $user->id, 
         ]);
 
-        // Redirecionamento após a criação
-        return redirect()->route('admin.index')->with('success', 'Estudante criado com sucesso!');
+        return redirect()->route('admin.students.index')->with('success', 'Estudante criado com sucesso!');
     }
 
     public function edit($id)
@@ -53,35 +61,49 @@ class StudentController extends Controller
     public function update(Request $request, $id)
     {
         $student = Student::findOrFail($id);
-        //dd($student);
 
-        // Validação dos dados recebidos do formulário
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:student,email,' . $student->id,
+            'email' => 'required|string|email|max:255|unique:student,email,' . $student->id, // ← Corrigido: student
             'age' => 'required|integer|min:1|max:25',
             'password' => 'nullable|string|min:6',
             'class_id' => 'required|exists:classes,id',
         ]);
 
+        // Atualizar estudante
         $student->name = $validatedData['name'];
         $student->email = $validatedData['email'];
         $student->age = $validatedData['age'];
         if (!empty($validatedData['password'])) {
-            $student->password = bcrypt($validatedData['password']);
+            $student->password = Hash::make($validatedData['password']);
         }
         $student->class_id = $validatedData['class_id'];
         $student->save();
 
-        // Redirecionamento após a atualização
-        return redirect()->route('admin.index')->with('success', 'Estudante atualizado com sucesso!');
+        // Atualizar usuário correspondente
+        $user = \App\Models\User::where('email', $student->email)->first();
+        if ($user) {
+            $user->name = $validatedData['name'];
+            if (!empty($validatedData['password'])) {
+                $user->password = Hash::make($validatedData['password']);
+            }
+            $user->save();
+        }
+
+        return redirect()->route('admin.students.index')->with('success', 'Estudante atualizado com sucesso!');
     }
 
     public function destroy($id)
     {
         $student = Student::findOrFail($id);
+        
+        $user = \App\Models\User::where('email', $student->email)->first();
+        if ($user) {
+            $user->delete();
+        }
+        
         $student->delete();
 
-        return redirect()->route('admin.index')->with('success', 'Estudante deletado com sucesso!');
+        return redirect()->route('admin.students.index')->with('success', 'Estudante deletado com sucesso!');
     }
 }

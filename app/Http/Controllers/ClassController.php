@@ -39,7 +39,7 @@ class ClassController extends Controller
             $class->teachers()->sync($teacherIds);
         }
 
-        return redirect()->route('admin.classes.manage')
+        return redirect()->route('admin.classes.index')
                         ->with('success', 'Turma criada com sucesso!');
     }
 
@@ -78,7 +78,7 @@ class ClassController extends Controller
             $class->teachers()->detach();
         }
 
-        return redirect()->route('admin.classes.manage')
+        return redirect()->route('admin.classes.index')
                          ->with('success', 'Turma atualizada com sucesso!');
     }
 
@@ -87,7 +87,7 @@ class ClassController extends Controller
         $class = SchoolClass::findOrFail($id);
         $class->delete();
 
-        return redirect()->route('admin.classes.manage')
+        return redirect()->route('admin.classes.index')
                          ->with('success', 'Turma removida com sucesso!');
     }
 }
