@@ -24,18 +24,19 @@ class StudentController extends Controller
     {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:student', // ← Corrigido: unique:student
+            'email' => 'required|string|email|max:255|unique:student',
             'age' => 'required|integer|min:1|max:25',
-            'password' => 'required|string|min:6|confirmed', // Adicionei confirmed
+            'password' => 'required|string|min:6|confirmed',
             'class_id' => 'required|exists:classes,id',
         ]);
 
-        // Criar usuário para login
+        // Criar usuário para login - ADICIONE class_id AQUI
         $user = \App\Models\User::create([
             'name' => $validatedData['name'],
             'email' => $validatedData['email'],
             'password' => Hash::make($validatedData['password']),
             'role' => 'student',
+            'class_id' => $validatedData['class_id'], // ← ESTÁ FALTANDO ESTA LINHA!
         ]);
 
         // Criar estudante na tabela student
@@ -64,7 +65,7 @@ class StudentController extends Controller
 
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:student,email,' . $student->id, // ← Corrigido: student
+            'email' => 'required|string|email|max:255|unique:student,email,' . $student->id,
             'age' => 'required|integer|min:1|max:25',
             'password' => 'nullable|string|min:6',
             'class_id' => 'required|exists:classes,id',
@@ -80,10 +81,11 @@ class StudentController extends Controller
         $student->class_id = $validatedData['class_id'];
         $student->save();
 
-        // Atualizar usuário correspondente
+        // Atualizar usuário correspondente - ADICIONE class_id AQUI
         $user = \App\Models\User::where('email', $student->email)->first();
         if ($user) {
             $user->name = $validatedData['name'];
+            $user->class_id = $validatedData['class_id']; // ← ESTÁ FALTANDO ESTA LINHA!
             if (!empty($validatedData['password'])) {
                 $user->password = Hash::make($validatedData['password']);
             }

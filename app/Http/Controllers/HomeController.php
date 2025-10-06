@@ -43,8 +43,8 @@ class HomeController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
         
-        // Carregar as turmas do estudante com informações do professor
-        $classes = $user->classes()->with('teacher')->get();
+        // Buscar todas as classes com seus estudantes via relação muitos-para-muitos
+        $classes = SchoolClass::with(['students'])->get();
         
         return view('student.home', compact('classes'));
     }

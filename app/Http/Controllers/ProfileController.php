@@ -20,7 +20,7 @@ class ProfileController extends Controller
         
         // Carrega dados específicos baseados no role
         if ($user->role === 'teacher' || $user->role === 'student') {
-            $user->load('classes');
+            $user->load('schoolClasses');
         }
         
         // Estatísticas para admin

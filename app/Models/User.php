@@ -24,6 +24,10 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $appends = [
+        'foto_url',
+    ];
+
     protected function casts(): array
     {
         return [
@@ -45,7 +49,6 @@ class User extends Authenticatable
         return asset('img/sukuna.jpg');
     }
 
-
     /**
      * 🚦 Helpers para checar o papel do usuário
      */
@@ -65,11 +68,40 @@ class User extends Authenticatable
     }
 
     /**
-     * Relacionamento com turmas
+     * 🔄 CORREÇÃO: Relacionamento com turmas (MUITOS-PARA-MUITOS)
      */
-    public function classes()
+    public function schoolClasses()
     {
-        return $this->belongsToMany(SchoolClass::class, 'class_user', 'user_id', 'class_id');
+        return $this->belongsToMany(SchoolClass::class, 'class_user', 'user_id', 'class_id')
+                    ->withTimestamps();
+    }
+
+    /**
+     * 🔄 NOVO: Relacionamento com turmas como professor
+     */
+    public function teachingClasses()
+    {
+        return $this->belongsToMany(SchoolClass::class, 'class_teacher', 'teacher_id', 'class_id')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Helper para obter a primeira turma do estudante (se houver)
+     */
+    public function getFirstClassAttribute()
+    {
+        if ($this->isStudent()) {
+            return $this->schoolClasses->first();
+        }
+        return null;
+    }
+
+    /**
+     * Helper para verificar se o usuário está em alguma turma
+     */
+    public function hasClasses(): bool
+    {
+        return $this->schoolClasses()->exists();
     }
 
     /**
@@ -94,5 +126,23 @@ class User extends Authenticatable
     public function scopeAdmins($query)
     {
         return $query->where('role', 'admin');
+    }
+
+    /**
+     * 🔄 NOVO: Escopo para usuários em uma turma específica
+     */
+    public function scopeInClass($query, $classId)
+    {
+        return $query->whereHas('schoolClasses', function($q) use ($classId) {
+            $q->where('classes.id', $classId);
+        });
+    }
+
+    /**
+     * 🔄 NOVO: Escopo para usuários sem turma
+     */
+    public function scopeWithoutClass($query)
+    {
+        return $query->whereDoesntHave('schoolClasses');
     }
 }
