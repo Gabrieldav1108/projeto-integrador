@@ -16,21 +16,27 @@ class SchoolClass extends Model
         'numberClass',
     ];
 
-    public function informations()
+    // ... outros métodos existentes ...
+
+    public function subjects()
     {
-        return $this->hasMany(ClassInformation::class, 'class_id');
+        return $this->belongsToMany(Subject::class, 'class_subject', 'class_id', 'subject_id')
+                    ->withTimestamps();
     }
 
-    // CORREÇÃO DEFINITIVA - Remover o where duplicado
+    // Manter students para controle de matrícula
     public function students()
     {
         return $this->belongsToMany(User::class, 'class_user', 'class_id', 'user_id')
-                    ->where('users.role', 'student') // Apenas UM where
+                    ->where('role', 'student')
                     ->withTimestamps();
     }
 
     public function teachers()
     {
-        return $this->belongsToMany(Teacher::class, 'class_teacher', 'class_id', 'teacher_id');
+        return $this->belongsToMany(User::class, 'class_user', 'class_id', 'user_id')
+                    ->where('role', 'teacher')
+                    ->withTimestamps();
     }
+   
 }

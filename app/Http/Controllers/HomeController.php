@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\SchoolClass;
+use App\Models\Subject;
 
 class HomeController extends Controller
 {
@@ -33,19 +34,21 @@ class HomeController extends Controller
         return view('admin.home');
     }
 
-    public function indexTeacher()
-    {
-        return view('teacher.home');
-    }
-
     public function indexStudent()
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
         
-        // Buscar todas as classes com seus estudantes via relação muitos-para-muitos
-        $classes = SchoolClass::with(['students'])->get();
-        
-        return view('student.home', compact('classes'));
+        // Remover o with('teachers') - não precisamos mais
+        $subjects = Subject::whereHas('schoolClasses.students', function($query) use ($user) {
+            $query->where('users.id', $user->id);
+        })->get();
+
+        return view('student.home', compact('subjects'));
+    }
+
+    public function indexTeacher()
+    {
+        return view('teacher.home');
     }
 }

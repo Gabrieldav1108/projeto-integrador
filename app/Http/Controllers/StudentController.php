@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Student;
+use App\Models\User;
+use App\Models\SchoolClass;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class StudentController extends Controller
 {
@@ -16,7 +19,7 @@ class StudentController extends Controller
 
     public function create()
     {
-        $schoolClasses = \App\Models\SchoolClass::all();
+        $schoolClasses = SchoolClass::all();
         return view('admin.students.create', compact('schoolClasses'));
     }
     
@@ -24,39 +27,45 @@ class StudentController extends Controller
     {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:student',
+            'email' => 'required|string|email|max:255|unique:users', // Corrigido para 'users'
             'age' => 'required|integer|min:1|max:25',
             'password' => 'required|string|min:6|confirmed',
             'class_id' => 'required|exists:classes,id',
         ]);
 
-        // Criar usuário para login - ADICIONE class_id AQUI
-        $user = \App\Models\User::create([
-            'name' => $validatedData['name'],
-            'email' => $validatedData['email'],
-            'password' => Hash::make($validatedData['password']),
-            'role' => 'student',
-            'class_id' => $validatedData['class_id'], // ← ESTÁ FALTANDO ESTA LINHA!
-        ]);
+        DB::transaction(function () use ($validatedData) {
+            // 1. Criar usuário para login - SEM class_id na tabela users
+            $user = User::create([
+                'name' => $validatedData['name'],
+                'email' => $validatedData['email'],
+                'password' => Hash::make($validatedData['password']),
+                'role' => 'student',
+            ]);
 
-        // Criar estudante na tabela student
-        $student = Student::create([
-            'name' => $validatedData['name'],
-            'email' => $validatedData['email'],
-            'age' => $validatedData['age'],
-            'password' => Hash::make($validatedData['password']),
-            'class_id' => $validatedData['class_id'],
-            'user_id' => $user->id, 
-        ]);
+            $user->schoolClasses()->attach($validatedData['class_id']);
 
-        return redirect()->route('admin.students.index')->with('success', 'Estudante criado com sucesso!');
+            Student::create([
+                'name' => $validatedData['name'],
+                'email' => $validatedData['email'],
+                'age' => $validatedData['age'],
+                'password' => Hash::make($validatedData['password']),
+                'class_id' => $validatedData['class_id'],
+                'user_id' => $user->id, 
+            ]);
+        });
+
+        return redirect()->route('admin.students.index')->with('success', 'Estudante criado e matriculado na turma com sucesso!');
     }
 
     public function edit($id)
     {
         $student = Student::findOrFail($id);
-        $schoolClasses = \App\Models\SchoolClass::all();
-        return view('admin.students.edit', compact('student', 'schoolClasses'));
+        $schoolClasses = SchoolClass::all();
+        
+        // Buscar o usuário correspondente
+        $user = User::where('email', $student->email)->first();
+        
+        return view('admin.students.edit', compact('student', 'schoolClasses', 'user'));
     }
 
     public function update(Request $request, $id)
@@ -65,32 +74,40 @@ class StudentController extends Controller
 
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:student,email,' . $student->id,
+            'email' => 'required|string|email|max:255|unique:students,email,' . $student->id,
             'age' => 'required|integer|min:1|max:25',
             'password' => 'nullable|string|min:6',
             'class_id' => 'required|exists:classes,id',
         ]);
 
-        // Atualizar estudante
-        $student->name = $validatedData['name'];
-        $student->email = $validatedData['email'];
-        $student->age = $validatedData['age'];
-        if (!empty($validatedData['password'])) {
-            $student->password = Hash::make($validatedData['password']);
-        }
-        $student->class_id = $validatedData['class_id'];
-        $student->save();
+        DB::transaction(function () use ($student, $validatedData) {
+            // 1. Atualizar estudante
+            $student->update([
+                'name' => $validatedData['name'],
+                'email' => $validatedData['email'],
+                'age' => $validatedData['age'],
+                'class_id' => $validatedData['class_id'],
+                'password' => !empty($validatedData['password']) 
+                    ? Hash::make($validatedData['password']) 
+                    : $student->password,
+            ]);
 
-        // Atualizar usuário correspondente - ADICIONE class_id AQUI
-        $user = \App\Models\User::where('email', $student->email)->first();
-        if ($user) {
-            $user->name = $validatedData['name'];
-            $user->class_id = $validatedData['class_id']; // ← ESTÁ FALTANDO ESTA LINHA!
-            if (!empty($validatedData['password'])) {
-                $user->password = Hash::make($validatedData['password']);
+            // 2. Atualizar usuário correspondente
+            $user = User::where('email', $student->getOriginal('email'))->first();
+            if ($user) {
+                // 🔥 IMPORTANTE: Atualizar a matrícula na tabela pivô
+                $user->schoolClasses()->sync([$validatedData['class_id']]);
+                
+                // Atualizar dados do usuário
+                $user->update([
+                    'name' => $validatedData['name'],
+                    'email' => $validatedData['email'],
+                    'password' => !empty($validatedData['password']) 
+                        ? Hash::make($validatedData['password']) 
+                        : $user->password,
+                ]);
             }
-            $user->save();
-        }
+        });
 
         return redirect()->route('admin.students.index')->with('success', 'Estudante atualizado com sucesso!');
     }
@@ -99,13 +116,19 @@ class StudentController extends Controller
     {
         $student = Student::findOrFail($id);
         
-        $user = \App\Models\User::where('email', $student->email)->first();
-        if ($user) {
-            $user->delete();
-        }
-        
-        $student->delete();
+        DB::transaction(function () use ($student) {
+            // Encontrar e deletar o usuário
+            $user = User::where('email', $student->email)->first();
+            if ($user) {
+                // Remover matrículas antes de deletar
+                $user->schoolClasses()->detach();
+                $user->delete();
+            }
+            
+            $student->delete();
+        });
 
         return redirect()->route('admin.students.index')->with('success', 'Estudante deletado com sucesso!');
     }
+
 }
