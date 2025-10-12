@@ -74,7 +74,7 @@ class StudentController extends Controller
 
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:students,email,' . $student->id,
+            'email' => 'required|string|email|max:255|unique:students,email,' . $student->id . '|unique:users,email,' . $student->user_id,
             'age' => 'required|integer|min:1|max:25',
             'password' => 'nullable|string|min:6',
             'class_id' => 'required|exists:classes,id',
@@ -93,9 +93,9 @@ class StudentController extends Controller
             ]);
 
             // 2. Atualizar usuário correspondente
-            $user = User::where('email', $student->getOriginal('email'))->first();
+            $user = User::find($student->user_id);
             if ($user) {
-                // 🔥 IMPORTANTE: Atualizar a matrícula na tabela pivô
+                // Atualizar matrícula na tabela pivô
                 $user->schoolClasses()->sync([$validatedData['class_id']]);
                 
                 // Atualizar dados do usuário
@@ -117,8 +117,8 @@ class StudentController extends Controller
         $student = Student::findOrFail($id);
         
         DB::transaction(function () use ($student) {
-            // Encontrar e deletar o usuário
-            $user = User::where('email', $student->email)->first();
+            // Encontrar e deletar o usuário pelo user_id (mais confiável)
+            $user = User::find($student->user_id);
             if ($user) {
                 // Remover matrículas antes de deletar
                 $user->schoolClasses()->detach();

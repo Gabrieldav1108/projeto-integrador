@@ -34,8 +34,7 @@ class SchoolClass extends Model
 
     public function teachers()
     {
-        return $this->belongsToMany(User::class, 'class_user', 'class_id', 'user_id')
-                    ->where('role', 'teacher')
+        return $this->belongsToMany(Teacher::class, 'class_teacher', 'class_id', 'teacher_id')
                     ->withTimestamps();
     }
    
