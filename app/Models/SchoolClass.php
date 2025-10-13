@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SchoolClass extends Model
 {
@@ -16,8 +17,10 @@ class SchoolClass extends Model
         'numberClass',
     ];
 
-    // ... outros métodos existentes ...
-
+    public function classInformations(): HasMany
+    {
+        return $this->hasMany(ClassInformation::class, 'class_id');
+    }
     public function subjects()
     {
         return $this->belongsToMany(Subject::class, 'class_subject', 'class_id', 'subject_id')
@@ -37,5 +40,6 @@ class SchoolClass extends Model
         return $this->belongsToMany(Teacher::class, 'class_teacher', 'class_id', 'teacher_id')
                     ->withTimestamps();
     }
+    
    
 }

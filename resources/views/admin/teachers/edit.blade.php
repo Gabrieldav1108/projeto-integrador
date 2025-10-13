@@ -36,16 +36,25 @@
                     <!-- Password -->
                     <div class="mb-3">
                         <label for="password" class="form-label">Nova Senha (deixe em branco para manter a atual)</label>
-                        <input type="password" name="password" id="password" class="form-control">
+                        <input type="password" name="password" id="password" class="form-control" placeholder="Digite apenas se quiser alterar">
+                        <small class="text-muted">Mínimo 6 caracteres</small>
                     </div>
                 </div>
 
                 <div class="col-md-6">
-                    <!-- Specialty -->
+
+                    <!-- Subject -->
                     <div class="mb-3">
-                        <label for="specialty" class="form-label">Especialidade/Matéria</label>
-                        <input type="text" name="specialty" id="specialty" class="form-control" 
-                               value="{{ old('specialty', $teacher->specialty) }}" placeholder="Ex: Matemática, Português, etc.">
+                        <label for="subject_id" class="form-label">Matéria Principal *</label>
+                        <select name="subject_id" id="subject_id" class="form-select" required>
+                            <option value="">Selecione uma matéria</option>
+                            @foreach($subjects as $subject)
+                                <option value="{{ $subject->id }}" 
+                                    {{ old('subject_id', $teacher->subject_id) == $subject->id ? 'selected' : '' }}>
+                                    {{ $subject->name }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <!-- Phone -->
@@ -59,22 +68,26 @@
                     <div class="mb-3">
                         <label for="hire_date" class="form-label">Data de Contratação *</label>
                         <input type="date" name="hire_date" id="hire_date" class="form-control" 
-                               value="{{ old('hire_date', $teacher->hire_date->format('Y-m-d')) }}" required>
+                               value="{{ old('hire_date', $teacher->hire_date ? $teacher->hire_date->format('Y-m-d') : '') }}" required>
                     </div>
 
                     <!-- Status -->
-                    <div class="mb-3 form-check">
+                    <div class="mb-3 form-check form-switch">
                         <input type="checkbox" class="form-check-input" id="is_active" name="is_active" value="1" 
-                               {{ old('is_active', $teacher->is_active) ? 'checked' : '' }}>
+                               {{ old('is_active', $teacher->is_active ?? true) ? 'checked' : '' }}>
                         <label for="is_active" class="form-check-label">Professor Ativo</label>
                     </div>
                 </div>
             </div>
 
             <!-- Buttons -->
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary fw-bold">Atualizar</button>
-                <a href="{{ route('admin.teachers.index') }}" class="btn btn-secondary">Cancelar</a>
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-primary fw-bold">
+                    <i class="fas fa-save me-2"></i>Atualizar Professor
+                </button>
+                <a href="{{ route('admin.teachers.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </a>
             </div>
         </form>
     </section>

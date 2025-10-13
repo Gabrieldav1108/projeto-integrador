@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ClassSubjectController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ClassController;
 use App\Http\Controllers\ClassInformationController;
@@ -35,6 +36,11 @@ Route::middleware(['auth'])->group(function () {
 Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function() {
     Route::get('home', [HomeController::class, 'indexAdmin'])->name('admin.home');
     Route::get('dashboard', [HomeController::class, 'indexAdmin'])->name('admin.dashboard'); // alias
+
+    Route::get('classes/{classId}/subjects', [ClassSubjectController::class, 'edit'])
+        ->name('admin.classes.subjects.edit');
+    Route::put('classes/{classId}/subjects', [ClassSubjectController::class, 'update'])
+        ->name('admin.classes.subjects.update');
     
     // Gerenciar Estudantes
     Route::prefix('students')->group(function() {
@@ -71,7 +77,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function() {
 //-------------------- TEACHER --------------------
 Route::prefix('teacher')->middleware(['auth', 'role:teacher'])->group(function() {
     Route::get('home', [HomeController::class, 'indexTeacher'])->name('teacher.home');
-    Route::get('dashboard', [HomeController::class, 'indexTeacher'])->name('teacher.dashboard'); // alias
+    Route::get('dashboard', [HomeController::class, 'indexTeacher'])->name('teacher.dashboard');
     
     // Turmas do Professor
     Route::prefix('classes')->group(function() {
@@ -79,12 +85,10 @@ Route::prefix('teacher')->middleware(['auth', 'role:teacher'])->group(function()
         Route::get('{classId}/show', [ClassController::class, 'show'])->name('teacher.classes.show');
     });
 
-    // Informações de Turma (mantendo suas rotas existentes)
+    // Informações de Turma
     Route::prefix('class/{classId}')->group(function () {
         Route::get('/informations', [ClassInformationController::class, 'index'])
             ->name('teacher.class.informations');
-        Route::get('/information', [ClassInformationController::class, 'show'])
-            ->name('teacher.class.information.show');
         Route::get('/information/add', [ClassInformationController::class, 'create'])
             ->name('teacher.class.information.add');
         Route::post('/information', [ClassInformationController::class, 'store'])
@@ -97,11 +101,13 @@ Route::prefix('teacher')->middleware(['auth', 'role:teacher'])->group(function()
             ->name('teacher.class.information.destroy');
     });
 
-    // Estudantes e Notas
-    Route::get('students', function(){
-        return view('teacher.studentInformation');
-    })->name('teacher.students.index');
-    
+    // Estudantes
+    Route::prefix('students')->group(function() {
+        Route::get('/', [StudentController::class, 'index'])->name('teacher.students.index');
+        Route::get('{studentId}', [StudentController::class, 'show'])->name('teacher.students.show');
+    });
+
+    // Notas
     Route::get('grades', function(){
         return view('teacher.editStudentGrade');
     })->name('teacher.grades.index');
@@ -117,6 +123,9 @@ Route::prefix('student')->middleware(['auth', 'role:student'])->group(function()
     Route::get('home', [HomeController::class, 'indexStudent'])->name('student.home');
     Route::get('dashboard', [HomeController::class, 'indexStudent'])->name('student.dashboard'); // alias
     
+    Route::get('subject/{subjectId}/classes', [HomeController::class, 'showSubjectClasses'])
+        ->name('student.classes.index');
+
     // Minhas Turmas
     Route::get('classes', function(){
         return view('student.classInformation');

@@ -40,11 +40,18 @@
                 </div>
 
                 <div class="col-md-6">
-                    <!-- Specialty -->
+
+                    <!-- Matéria (Subject) -->
                     <div class="mb-3">
-                        <label for="specialty" class="form-label">Especialidade/Matéria</label>
-                        <input type="text" name="specialty" id="specialty" class="form-control" value="{{ old('specialty') }}" 
-                               placeholder="Ex: Matemática, Português, etc.">
+                        <label for="subject_id" class="form-label">Matéria *</label>
+                        <select name="subject_id" id="subject_id" class="form-select" required>
+                            <option value="">Selecione uma matéria</option>
+                            @foreach($subjects as $subject)
+                                <option value="{{ $subject->id }}" {{ old('subject_id') == $subject->id ? 'selected' : '' }}>
+                                    {{ $subject->name }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <!-- Phone -->

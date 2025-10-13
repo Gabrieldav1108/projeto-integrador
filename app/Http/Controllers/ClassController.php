@@ -11,9 +11,10 @@ class ClassController extends Controller
 {
     public function index()
     {
-        $classes = SchoolClass::with('teachers')->get();
+        $classes = SchoolClass::with(['teachers', 'subjects'])->get();
         return view('admin.classes.manage', compact('classes'));
     }
+    
 
     public function create()
     {

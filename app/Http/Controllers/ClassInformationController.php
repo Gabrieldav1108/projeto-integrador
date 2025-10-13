@@ -2,112 +2,156 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ClassInformation as ModelsClassInformation;
+use App\Models\ClassInformation;
 use App\Models\SchoolClass;
-use COM;
+use App\Models\Teacher;
+use App\Models\Subject;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ClassInformationController extends Controller
 {
     public function index($classId)
     {
-        $schoolClass = SchoolClass::findOrFail($classId);
+        $schoolClass = SchoolClass::with('students')->findOrFail($classId);
         
-        $informations = ModelsClassInformation::where('class_id', $classId)
-            ->orderBy('created_at', 'desc')
+        $informations = ClassInformation::where('class_id', $classId)
+            ->active() 
+            ->latest()
             ->get();
-            
-        // Verifique se há informações
-        if ($informations->isEmpty()) {
-            // Se não houver informações, passe um array vazio
-            return view('teacher.class', compact('schoolClass', 'informations'));
-        }
         
-        $informations = \App\Models\ClassInformation::where('class_id', $classId)
-            ->orderBy('created_at', 'desc')
-            ->get();
-        return view('teacher.class', compact('informations', 'schoolClass'));
-    }
-
-    public function show($classId)
-    {
-        $schoolClass = SchoolClass::findOrFail($classId);
-        $informations = ModelsClassInformation::where('class_id', $classId)->get();
-
-
-        if (!$informations) {
-            return redirect()->route('class.informations', $classId)
-                             ->with('error', 'No information available for this class.');
-        }
-
-        return view('teacher.class', [
-            'schoolClass' => $schoolClass,
-            'informations' => $informations,
-        ]);
+        return view('teacher.class', compact('schoolClass', 'informations'));
     }
 
     public function create($classId)
     {
         $schoolClass = SchoolClass::findOrFail($classId);
-        return view('teacher.addClassInformation', compact('schoolClass'));
+        
+        $currentInformations = ClassInformation::where('class_id', $classId)
+            ->active() 
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+        return view('teacher.addClassInformation', compact('schoolClass', 'currentInformations'));
     }
 
     public function store(Request $request, $classId)
     {
-        $request->validate([
-            'content' => 'required|string',
+        $validated = $request->validate([
+            'content' => 'required|string|max:1000',
             'date' => 'nullable|date',
             'time' => 'nullable|date_format:H:i',
         ]);
 
-            ModelsClassInformation::create([
-            'class_id' => $classId,
-            'content' => $request->input('content'),
-            'date' => $request->input('date'),
-            'time' => $request->input('time'),
-        ]);
+        try {
+            $user = Auth::user();
+            
+            if (!$user) {
+                throw new \Exception('Usuário não autenticado.');
+            }
 
-        return redirect()->route('class.information.show', $classId)
-                ->with('success', 'Class information added successfully.');
+            $teacher = Teacher::where('user_id', $user->getAuthIdentifier())->first();
+
+            if (!$teacher) {
+                throw new \Exception('Professor não encontrado. Faça login como professor.');
+            }
+
+            if (!$teacher->getKey()) {
+                throw new \Exception('ID do professor não encontrado.');
+            }
+
+            if (!$teacher->subject_id) {
+                throw new \Exception('Você não tem uma matéria vinculada. Contate o administrador.');
+            }
+
+            $schoolClass = SchoolClass::with('teachers')->findOrFail($classId);
+            
+            $isTeacherInClass = $schoolClass->teachers->contains(function ($classTeacher) use ($teacher) {
+                return $classTeacher->getKey() === $teacher->getKey();
+            });
+
+            if (!$isTeacherInClass) {
+                throw new \Exception('Você não tem acesso a esta turma.');
+            }
+
+            ClassInformation::create([
+                'class_id' => $classId,
+                'subject_id' => $teacher->subject_id,
+                'content' => $validated['content'],
+                'date' => $validated['date'],
+                'time' => $validated['time'],
+            ]);
+
+            return redirect()
+                ->route('teacher.class.informations', $classId)
+                ->with('success', 'Aviso adicionado com sucesso!');
+
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'Erro ao adicionar aviso: ' . $e->getMessage());
+        }
     }
 
     public function edit($classId, $id)
     {
         $schoolClass = SchoolClass::findOrFail($classId);
-        $information = \App\Models\ClassInformation::where('class_id', $classId)
+        $information = ClassInformation::where('class_id', $classId)
             ->findOrFail($id);
-        return view('teacher.editClassInformation', compact('schoolClass', 'information'));
+        
+        $currentInformations = ClassInformation::where('class_id', $classId)
+            ->active() 
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+        return view('teacher.editClassInformation', compact('schoolClass', 'information', 'currentInformations'));
     }
 
     public function update(Request $request, $classId, $id)
     {
-        $request->validate([
-            'content' => 'required|string',
+        $validated = $request->validate([
+            'content' => 'required|string|max:1000',
             'date' => 'nullable|date',
             'time' => 'nullable|date_format:H:i',
         ]);
 
-        $information = \App\Models\ClassInformation::where('class_id', $classId)
-            ->findOrFail($id);
+        try {
+            $information = ClassInformation::where('class_id', $classId)
+                ->findOrFail($id);
+            
+            $information->update([
+                'content' => $validated['content'],
+                'date' => $validated['date'],
+                'time' => $validated['time'],
+            ]);
 
-        $information->update([
-            'content' => $request->input('content'),
-            'date' => $request->input('date'),
-            'time' => $request->input('time'),
-        ]);
+            return redirect()
+                ->route('teacher.class.informations', $classId)
+                ->with('success', 'Aviso atualizado com sucesso!');
 
-        return redirect()->route('class.information.show', ['classId' => $classId])
-                         ->with('success', 'Class information updated successfully.');
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'Erro ao atualizar aviso. Tente novamente.');
+        }
     }
 
     public function destroy($classId, $id)
     {
-        $information = \App\Models\ClassInformation::where('class_id', $classId)
-            ->findOrFail($id);
-        $information->delete();
+        try {
+            $information = ClassInformation::where('class_id', $classId)
+                ->findOrFail($id);
+            
+            $information->delete();
 
-        return redirect()->route('class.information.show', ['classId' => $classId])
-                         ->with('success', 'Class information deleted successfully.');
+            return redirect()
+                ->route('teacher.class.informations', $classId)
+                ->with('success', 'Aviso excluído com sucesso!');
+
+        } catch (\Exception $e) {
+            return back()
+                ->with('error', 'Erro ao excluir aviso. Tente novamente.');
+        }
     }
-
 }

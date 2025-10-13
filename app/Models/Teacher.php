@@ -4,20 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Teacher extends Model
 {
-    use HasFactory, Notifiable;
+    use HasFactory;
 
     protected $fillable = [
         'name',
         'email',
         'password',
-        'specialty',
+        'subject_id',
         'phone',
         'hire_date',
-        'is_active'
+        'is_active',
+        'user_id'
     ];
 
     protected $hidden = [
@@ -29,7 +30,25 @@ class Teacher extends Model
         'is_active' => 'boolean'
     ];
 
+    /**
+     * Relacionamento com User
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
+    /**
+     * Relacionamento com Subject
+     */
+    public function subject(): BelongsTo
+    {
+        return $this->belongsTo(Subject::class);
+    }
+
+    /**
+     * Relacionamento com SchoolClass (turmas)
+     */
     public function schoolClasses()
     {
         return $this->belongsToMany(SchoolClass::class, 'class_teacher', 'teacher_id', 'class_id')

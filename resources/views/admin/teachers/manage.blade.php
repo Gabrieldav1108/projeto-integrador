@@ -20,7 +20,7 @@
                     <tr>
                         <th>Nome</th>
                         <th>Email</th>
-                        <th>Especialidade</th>
+                        <th>Matéria</th>
                         <th>Telefone</th>
                         <th>Data de Contratação</th>
                         <th>Status</th>
@@ -32,7 +32,13 @@
                     <tr>
                         <td>{{ $teacher->name }}</td>
                         <td>{{ $teacher->email }}</td>
-                        <td>{{ $teacher->specialty ?? 'N/A' }}</td>
+                        <td>
+                            @if($teacher->subject)
+                                <span class="badge bg-primary">{{ $teacher->subject->name }}</span>
+                            @else
+                                <span class="badge bg-secondary">N/A</span>
+                            @endif
+                        </td>
                         <td>{{ $teacher->phone ?? 'N/A' }}</td>
                         <td>{{ $teacher->hire_date->format('d/m/Y') }}</td>
                         <td>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Teacher;
 use App\Models\User;
+use App\Models\Subject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -12,13 +13,14 @@ class TeacherController extends Controller
 {
     public function index()
     {
-        $teachers = Teacher::all();
+        $teachers = Teacher::with('subject')->get();
         return view('admin.teachers.manage', compact('teachers'));
     }
 
     public function create()
     {
-        return view('admin.teachers.create');
+        $subjects = Subject::all();
+        return view('admin.teachers.create', compact('subjects'));
     }
 
     public function store(Request $request)
@@ -27,7 +29,7 @@ class TeacherController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
-            'specialty' => 'nullable|string|max:255',
+            'subject_id' => 'required|exists:subjects,id',
             'phone' => 'nullable|string|max:20',
             'hire_date' => 'required|date',
         ]);
@@ -41,15 +43,15 @@ class TeacherController extends Controller
                 'role' => 'teacher',
             ]);
 
-            // 2. Criar registro na tabela teachers COM user_id
+            // 2. Criar registro na tabela teachers COM user_id e subject_id
             Teacher::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
-                'specialty' => $validated['specialty'],
+                'subject_id' => $validated['subject_id'],
                 'phone' => $validated['phone'],
                 'hire_date' => $validated['hire_date'],
-                'user_id' => $user->id, // ✅ AGORA FUNCIONANDO
+                'user_id' => $user->id,
             ]);
         });
 
@@ -63,7 +65,8 @@ class TeacherController extends Controller
 
     public function edit(Teacher $teacher)
     {
-        return view('admin.teachers.edit', compact('teacher'));
+        $subjects = Subject::all();
+        return view('admin.teachers.edit', compact('teacher', 'subjects'));
     }
 
     public function update(Request $request, Teacher $teacher)
@@ -72,7 +75,7 @@ class TeacherController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:teachers,email,' . $teacher->id . '|unique:users,email,' . $teacher->user_id,
             'password' => 'nullable|min:6',
-            'specialty' => 'nullable|string|max:255',
+            'subject_id' => 'required|exists:subjects,id',
             'phone' => 'nullable|string|max:20',
             'hire_date' => 'required|date',
             'is_active' => 'boolean'
@@ -98,7 +101,7 @@ class TeacherController extends Controller
             $teacherData = [
                 'name' => $validated['name'],
                 'email' => $validated['email'],
-                'specialty' => $validated['specialty'],
+                'subject_id' => $validated['subject_id'],
                 'phone' => $validated['phone'],
                 'hire_date' => $validated['hire_date'],
                 'is_active' => $request->has('is_active')
@@ -109,9 +112,6 @@ class TeacherController extends Controller
             }
 
             $teacher->update($teacherData);
-            
-            // Log para debug
-            logger('Professor atualizado: ' . $teacher->name . ' | Teacher ID: ' . $teacher->id . ' | User ID: ' . $teacher->user_id);
         });
 
         return redirect()->route('admin.teachers.index')->with('success', 'Professor atualizado com sucesso!');

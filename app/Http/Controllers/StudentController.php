@@ -17,6 +17,12 @@ class StudentController extends Controller
         return view('admin.students.manage', compact('students'));
     }
 
+    public function show($studentId)
+    {
+        $student = Student::with(['user', 'schoolClass'])->findOrFail($studentId);
+        return view('teacher.students.show', compact('student'));
+    }
+
     public function create()
     {
         $schoolClasses = SchoolClass::all();

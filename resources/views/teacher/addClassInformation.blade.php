@@ -1,7 +1,7 @@
 <x-app-layout>
     @slot('title', 'Adicionar informações - {{ $schoolClass->name }}')
 
-    <x-header/>
+    <x-teacher-header/>
     
     <section class="container p-3 mt-5 rounded-4" style="background-color: #cfe2ff">
         <h2>Informações sobre a turma: {{$schoolClass->name}}</h2>
@@ -10,7 +10,7 @@
             <!-- Formulário -->
             <div class="col-12 col-md-5">
                 <div class="border rounded p-3 bg-white h-100">
-                    <form method="POST" action="{{ route('class.information.store', $schoolClass->id) }}" class="w-100 d-flex flex-column">
+                    <form method="POST" action="{{ route('teacher.class.information.store', $schoolClass->id) }}" class="w-100 d-flex flex-column">
                         @csrf
                         <h5 class="text-center"><strong>Adicionar</strong></h5>
                         <p class="text-center">Escreva abaixo as informações ou avisos para a turma {{ $schoolClass->name }}</p>
@@ -36,39 +36,56 @@
                         <input type="time" class="form-control" name="time" id="time" value="{{ old('time') }}">
                         
                         <div class="d-flex gap-2 justify-content-center mt-3">
-                            <a href="{{ route('class.informations', $schoolClass->id) }}" class="btn btn-secondary">Cancelar</a>
+                            <a href="{{ route('teacher.class.informations', $schoolClass->id) }}" class="btn btn-secondary">Cancelar</a>
                             <button type="submit" class="btn btn-primary">Adicionar</button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <!-- Informações atuais -->
-            <div class="col-12 col-md-6">
-                <div class="border rounded p-3 bg-light h-100 d-flex flex-column">
-                    <h5 class="text-center mb-3">Informações atuais</h5>
-                    @php
-                        $currentInformations = $schoolClass->informations()->orderBy('created_at', 'desc')->get();
-                    @endphp
-                    
-                    @if($currentInformations->count() > 0)
-                        <ul class="list-group">
-                            @foreach($currentInformations as $info)
-                                <li class="list-group-item">
+        <!-- Informações atuais -->
+        <div class="col-12 col-md-6">
+            <div class="border rounded p-3 bg-light h-100 d-flex flex-column">
+                <h5 class="text-center mb-3">Informações atuais (ativas)</h5>
+                @if($currentInformations->count() > 0)
+                    <ul class="list-group">
+                        @foreach($currentInformations as $info)
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
                                     <strong>{{ $info->content }}</strong>
                                     @if($info->date)
-                                        - {{ $info->date->format('d/m/Y') }}
+                                        - {{ \Carbon\Carbon::parse($info->date)->format('d/m/Y') }}
+                                        @if($info->time)
+                                            às {{ \Carbon\Carbon::parse($info->time)->format('H:i') }}
+                                        @endif
                                     @endif
-                                    @if($info->time)
-                                        às {{ \Carbon\Carbon::parse($info->time)->format('H:i') }}
+                                    @if($info->isExpired())
+                                        <span class="badge bg-warning text-dark ms-2">Expirado</span>
+                                    @else
+                                        <span class="badge bg-success ms-2">Ativo</span>
                                     @endif
-                                </li>
-                            @endforeach
-                        </ul>
-                    @else
-                        <p class="text-center text-muted">Nenhuma informação cadastrada.</p>
-                    @endif
-                </div>
+                                </div>
+                                <div class="d-flex gap-1">
+                                    <a href="{{ route('teacher.class.information.edit', ['classId' => $schoolClass->id, 'id' => $info->id]) }}" 
+                                    class="btn btn-sm btn-outline-primary">Editar</a>
+                                    <form action="{{ route('teacher.class.information.destroy', ['classId' => $schoolClass->id, 'id' => $info->id]) }}" 
+                                        method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                onclick="return confirm('Tem certeza que deseja excluir este aviso?')">
+                                            Excluir
+                                        </button>
+                                    </form>
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
+                @else
+                    <p class="text-center text-muted">Nenhuma informação ativa no momento.</p>
+                @endif
             </div>
+        </div>
+        </div>
     </section>
 </x-app-layout>
