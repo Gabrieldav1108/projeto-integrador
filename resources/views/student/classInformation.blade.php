@@ -1,39 +1,161 @@
 <x-app-layout>
-    @slot('title', 'Informações da turma')
+    @slot('title', $subject->name)
     <x-student-header/>
+    
     <section class="container p-4 mt-5 rounded-4" style="background-color: #cfe2ff">
-        <strong><h2>Informações da turma</h2></strong>
-        <div class="row rounded p-4 align-items-stretch mt-3">
-            <!-- Alunos matriculados -->
-            <div class="col-12 col-md-6 mb-4 mb-md-0 d-flex flex-column">
-                <h3 class="mb-2 mb-md-0">Informações sobre a matéria</h3>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">Matéria: {{ $subject->name }}</h2>
+            <a href="{{ route('student.home') }}" class="btn btn-secondary">
+                ← Voltar
+            </a>
+        </div>
 
-                <div class="border rounded d-flex align-items-center flex-column justify-content-center p-3 bg-light text-center mt-3" style="height: 300px;">
-                    <strong>Nome do professor: professor tal</strong></br>
-                    <span><b>Horário de aula:</b> tal dia da semana tal horario</span></br>
-                    <p><b>Plano de ensino:</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris consequat risus a euismod mollis. Proin eu sem augue. Duis est lorem, malesuada et dui in, finibus elementum odio. Lorem ipsum.</p>
+        <div class="row rounded p-4 align-items-stretch mt-3">
+            <!-- Informações sobre a matéria -->
+            <div class="col-12 col-md-6 mb-4 mb-md-0 d-flex flex-column">
+                <h3 class="mb-3">Informações sobre a matéria</h3>
+
+                <div class="border rounded p-4 bg-white" style="min-height: 300px;">
+                    @if($mainTeacher)
+                        <div class="text-center mb-4">
+                            <div class="mb-3">
+                                <i class="fas fa-chalkboard-teacher fa-3x text-primary"></i>
+                            </div>
+                            <strong class="fs-5">Professor: {{ $mainTeacher->name }}</strong>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>📧 Email:</strong> 
+                            <span class="ms-2">{{ $mainTeacher->email }}</span>
+                        </div>
+                        
+                        @if($mainTeacher->phone)
+                        <div class="mb-3">
+                            <strong>📞 Telefone:</strong> 
+                            <span class="ms-2">{{ $mainTeacher->phone }}</span>
+                        </div>
+                        @endif
+                        
+                        @if($mainTeacher->specialty)
+                        <div class="mb-3">
+                            <strong>🎓 Especialidade:</strong> 
+                            <span class="ms-2">{{ $mainTeacher->specialty }}</span>
+                        </div>
+                        @endif
+                    @else
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-user-slash fa-3x mb-3"></i>
+                            <p>Nenhum professor vinculado a esta matéria.</p>
+                        </div>
+                    @endif
+
+                    <!-- Descrição da matéria -->
+                    <div class="mt-4 pt-3 border-top">
+                        <strong>📝 Descrição:</strong>
+                        <p class="mt-2">{{ $subject->description ?? 'Sem descrição disponível.' }}</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Avisos -->
-            <div class="col-12 col-md-6 d-flex flex-column" >
+            <!-- Avisos do professor -->
+            <div class="col-12 col-md-6 d-flex flex-column">
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
                     <h3 class="mb-2 mb-md-0">Avisos do professor</h3>
-                    <a href={{ route('student.dashboard') }} class="btn btn-primary w-md-auto">Notas</a>
+                    <a href="{{ route('student.dashboard') }}" class="btn btn-primary w-md-auto">Notas</a>
                 </div>
 
                 <div class="border rounded p-3 bg-light h-100">
-                    <ul class="list-group">
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Prova de matemática - 10/07
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Entrega do trabalho de história - 15/07
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Apresentação de ciências - 20/07
-                        </li>
-                    </ul>
+                    @if($subject->classInformations->count() > 0)
+                        <ul class="list-group">
+                            @foreach($subject->classInformations as $info)
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="flex-grow-1">
+                                        <strong>{{ $info->content }}</strong>
+                                        @if($info->date || $info->time)
+                                            <br>
+                                            <small class="text-muted">
+                                                @if($info->date)
+                                                    📅 {{ \Carbon\Carbon::parse($info->date)->format('d/m/Y') }}
+                                                @endif
+                                                @if($info->time)
+                                                    ⏰ {{ \Carbon\Carbon::parse($info->time)->format('H:i') }}
+                                                @endif
+                                            </small>
+                                        @endif
+                                        @if($info->schoolClass)
+                                            <br>
+                                            <small class="text-muted">
+                                                Turma: {{ $info->schoolClass->name }}
+                                            </small>
+                                        @endif
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <div class="text-center py-4 text-muted">
+                            <i class="fas fa-bell-slash fa-2x mb-3"></i>
+                            <p>Nenhum aviso disponível no momento.</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <!-- Turmas do estudante nesta matéria -->
+        @if($userClasses->count() > 0)
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h5 class="card-title">🏫 Minhas Turmas nesta Matéria</h5>
+                        <div class="row">
+                            @foreach($userClasses as $class)
+                                <div class="col-md-4 mb-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h6>{{ $class->name }}</h6>
+                                            <p class="small text-muted mb-2">
+                                                Código: {{ $class->numberClass }}
+                                            </p>
+                                            @if($class->teachers->count() > 0)
+                                                <p class="small mb-1">
+                                                    <strong>Professores:</strong>
+                                                    {{ $class->teachers->pluck('name')->implode(', ') }}
+                                                </p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
+        <!-- Informações adicionais da matéria -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h5 class="card-title">📊 Informações da Matéria</h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <strong>🏫 Turmas com esta matéria:</strong> 
+                                {{ $subject->schoolClasses->count() }}
+                            </div>
+                            <div class="col-md-4">
+                                <strong>👨‍🏫 Professores:</strong> 
+                                {{ $subject->teachers->count() }}
+                            </div>
+                            <div class="col-md-4">
+                                <strong>📢 Avisos ativos:</strong> 
+                                {{ $subject->classInformations->count() }}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

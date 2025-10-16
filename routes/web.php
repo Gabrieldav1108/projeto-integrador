@@ -8,8 +8,8 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
-use App\Http\Controllers\GradeController; // Adicione se tiver
-use App\Http\Controllers\ScheduleController; // Adicione se tiver
+use App\Http\Controllers\GradeController;
+use App\Http\Controllers\ScheduleController;
 use Illuminate\Support\Facades\Route;
 
 //-------------------- Rotas Públicas --------------------
@@ -35,7 +35,7 @@ Route::middleware(['auth'])->group(function () {
 //-------------------- ADMIN --------------------
 Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function() {
     Route::get('home', [HomeController::class, 'indexAdmin'])->name('admin.home');
-    Route::get('dashboard', [HomeController::class, 'indexAdmin'])->name('admin.dashboard'); // alias
+    Route::get('dashboard', [HomeController::class, 'indexAdmin'])->name('admin.dashboard');
 
     Route::get('classes/{classId}/subjects', [ClassSubjectController::class, 'edit'])
         ->name('admin.classes.subjects.edit');
@@ -79,25 +79,28 @@ Route::prefix('teacher')->middleware(['auth', 'role:teacher'])->group(function()
     Route::get('home', [HomeController::class, 'indexTeacher'])->name('teacher.home');
     Route::get('dashboard', [HomeController::class, 'indexTeacher'])->name('teacher.dashboard');
     
-    // Turmas do Professor
+    // Turmas do Professor - CORREÇÃO: Adicionar rota para mostrar turma específica
     Route::prefix('classes')->group(function() {
         Route::get('/', [ClassController::class, 'teacherClasses'])->name('teacher.classes.index');
-        Route::get('{classId}/show', [ClassController::class, 'show'])->name('teacher.classes.show');
+        Route::get('{classId}', [ClassController::class, 'show'])->name('teacher.classes.show'); // CORREÇÃO AQUI
     });
 
-    // Informações de Turma
+    // Informações de Turma - CORREÇÃO: Reorganizar as rotas
     Route::prefix('class/{classId}')->group(function () {
+        // Rota para visualizar informações da turma (index)
         Route::get('/informations', [ClassInformationController::class, 'index'])
             ->name('teacher.class.informations');
-        Route::get('/information/add', [ClassInformationController::class, 'create'])
+        
+        // Rotas CRUD para informações
+        Route::get('/information/create', [ClassInformationController::class, 'create'])
             ->name('teacher.class.information.add');
         Route::post('/information', [ClassInformationController::class, 'store'])
             ->name('teacher.class.information.store');
-        Route::get('/information/{id}/edit', [ClassInformationController::class, 'edit'])
+        Route::get('/information/{information}/edit', [ClassInformationController::class, 'edit'])
             ->name('teacher.class.information.edit');
-        Route::put('/information/{id}', [ClassInformationController::class, 'update'])
+        Route::put('/information/{information}', [ClassInformationController::class, 'update'])
             ->name('teacher.class.information.update');
-        Route::delete('/information/{id}', [ClassInformationController::class, 'destroy'])
+        Route::delete('/information/{information}', [ClassInformationController::class, 'destroy'])
             ->name('teacher.class.information.destroy');
     });
 
@@ -121,16 +124,16 @@ Route::prefix('teacher')->middleware(['auth', 'role:teacher'])->group(function()
 //-------------------- STUDENT --------------------
 Route::prefix('student')->middleware(['auth', 'role:student'])->group(function() {
     Route::get('home', [HomeController::class, 'indexStudent'])->name('student.home');
-    Route::get('dashboard', [HomeController::class, 'indexStudent'])->name('student.dashboard'); // alias
+    Route::get('dashboard', [HomeController::class, 'indexStudent'])->name('student.dashboard');
     
-    Route::get('subject/{subjectId}/classes', [HomeController::class, 'showSubjectClasses'])
-        ->name('student.classes.index');
+    // Turmas do estudante
+    Route::get('classes', [StudentController::class, 'index'])->name('student.classes.index');
+    Route::get('class/{classId}', [StudentController::class, 'show'])->name('student.class.show');
 
-    // Minhas Turmas
-    Route::get('classes', function(){
-        return view('student.classInformation');
-    })->name('student.classes.index');
-    
+    // Matérias do estudante  
+       Route::get('subject/{subjectId}', [StudentController::class, 'showSubject'])
+        ->name('student.subject.show');
+
     // Minhas Notas
     Route::get('grades', function () {
         return view('student.classGrade');

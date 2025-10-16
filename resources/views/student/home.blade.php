@@ -13,7 +13,7 @@
                             <p class="small text-muted mb-3">
                                 {{ $subject->description ?? 'Sem descrição' }}
                             </p>
-                            <a class="btn btn-primary fw-bold" href="{{ route('student.classes.index', $subject->id) }}">
+                            <a class="btn btn-primary fw-bold" href="{{ route('student.subject.show', $subject->id) }}">
                                 Ver Matéria
                             </a>
                         </div>

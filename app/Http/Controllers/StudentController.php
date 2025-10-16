@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Student;
 use App\Models\User;
 use App\Models\SchoolClass;
+use App\Models\Subject;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 
@@ -21,6 +23,45 @@ class StudentController extends Controller
     {
         $student = Student::with(['user', 'schoolClass'])->findOrFail($studentId);
         return view('teacher.students.show', compact('student'));
+    }
+
+        public function showSubject($subjectId)
+    {
+        // Buscar a matéria com turmas, professores e avisos
+        $subject = Subject::with([
+            'schoolClasses.teachers',
+            'schoolClasses.students',
+            'classInformations' => function($query) {
+                $query->active()->latest();
+            },
+            'teachers'
+        ])->findOrFail($subjectId);
+
+        // Verificar se o estudante está matriculado em alguma turma desta matéria
+        $user = Auth::user();
+        $isStudentInSubject = $subject->schoolClasses()
+            ->whereHas('students', function($query) use ($user) {
+                $query->where('users.id', $user->id);
+            })->exists();
+
+        if (!$isStudentInSubject) {
+            abort(403, 'Você não está matriculado nesta matéria.');
+        }
+
+        // Buscar o professor desta matéria
+        $mainTeacher = $subject->teachers->first();
+        
+        // Buscar turmas do estudante nesta matéria
+        $userClasses = $subject->schoolClasses()
+            ->whereHas('students', function($query) use ($user) {
+                $query->where('users.id', $user->id);
+            })->get();
+
+        return view('student.classInformation', compact(
+            'subject', 
+            'mainTeacher', 
+            'userClasses'
+        ));
     }
 
     public function create()

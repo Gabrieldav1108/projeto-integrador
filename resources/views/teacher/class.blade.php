@@ -16,7 +16,8 @@
                             @foreach($schoolClass->students as $student)
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <span>{{ $student->user->name ?? $student->name }}</span>
-                                    <a href="{{ route('teacher.studentInformation') }}" 
+                                    <!-- CORREÇÃO: Use a rota correta para visualizar aluno -->
+                                    <a href="{{ route('teacher.students.show', $student->id) }}" 
                                        class="btn btn-primary btn-sm">
                                         Ver aluno
                                     </a>
@@ -59,11 +60,11 @@
                                         </small>
                                     </div>
                                     <div class="d-flex gap-2 align-items-stretch">
-                                        <a href="{{ route('teacher.class.information.edit', ['classId' => $schoolClass->id, 'id' => $info->id]) }}" 
+                                        <a href="{{ route('teacher.class.information.edit', ['classId' => $schoolClass->id, 'information' => $info->id]) }}" 
                                            class="btn btn-sm btn-outline-primary d-flex align-items-center">
                                             Editar
                                         </a>
-                                        <form action="{{ route('teacher.class.information.destroy', ['classId' => $schoolClass->id, 'id' => $info->id]) }}" 
+                                        <form action="{{ route('teacher.class.information.destroy', ['classId' => $schoolClass->id, 'information' => $info->id]) }}" 
                                               method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
