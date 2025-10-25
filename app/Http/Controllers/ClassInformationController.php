@@ -4,23 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Models\ClassInformation;
 use App\Models\SchoolClass;
+use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\Subject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ClassInformationController extends Controller
 {
     public function index($classId)
     {
-        $schoolClass = SchoolClass::with('students')->findOrFail($classId);
+        $schoolClass = SchoolClass::with(['students'])->findOrFail($classId);
         
         $informations = ClassInformation::where('class_id', $classId)
             ->active() 
             ->latest()
             ->get();
         
+        // Agora usamos $schoolClass->students diretamente (que são users)
         return view('teacher.class', compact('schoolClass', 'informations'));
     }
 

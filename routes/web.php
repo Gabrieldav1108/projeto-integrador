@@ -8,8 +8,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
-use App\Http\Controllers\GradeController;
-use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\Teacher\TeacherStudentController;
 use Illuminate\Support\Facades\Route;
 
 //-------------------- Rotas Públicas --------------------
@@ -79,19 +78,16 @@ Route::prefix('teacher')->middleware(['auth', 'role:teacher'])->group(function()
     Route::get('home', [HomeController::class, 'indexTeacher'])->name('teacher.home');
     Route::get('dashboard', [HomeController::class, 'indexTeacher'])->name('teacher.dashboard');
     
-    // Turmas do Professor - CORREÇÃO: Adicionar rota para mostrar turma específica
+    // Turmas do Professor
     Route::prefix('classes')->group(function() {
         Route::get('/', [ClassController::class, 'teacherClasses'])->name('teacher.classes.index');
-        Route::get('{classId}', [ClassController::class, 'show'])->name('teacher.classes.show'); // CORREÇÃO AQUI
+        Route::get('{classId}', [ClassController::class, 'show'])->name('teacher.classes.show');
     });
 
-    // Informações de Turma - CORREÇÃO: Reorganizar as rotas
+    // Informações de Turma
     Route::prefix('class/{classId}')->group(function () {
-        // Rota para visualizar informações da turma (index)
         Route::get('/informations', [ClassInformationController::class, 'index'])
             ->name('teacher.class.informations');
-        
-        // Rotas CRUD para informações
         Route::get('/information/create', [ClassInformationController::class, 'create'])
             ->name('teacher.class.information.add');
         Route::post('/information', [ClassInformationController::class, 'store'])
@@ -104,10 +100,18 @@ Route::prefix('teacher')->middleware(['auth', 'role:teacher'])->group(function()
             ->name('teacher.class.information.destroy');
     });
 
-    // Estudantes
+    // Estudantes - AGORA USANDO O CONTROLLER DO PROFESSOR
     Route::prefix('students')->group(function() {
-        Route::get('/', [StudentController::class, 'index'])->name('teacher.students.index');
-        Route::get('{studentId}', [StudentController::class, 'show'])->name('teacher.students.show');
+        Route::get('/', [TeacherStudentController::class, 'show'])
+            ->name('teacher.students.index');
+        Route::get('all', [TeacherStudentController::class, 'show'])
+            ->name('teacher.students.all');
+        Route::get('class/{classId}', [TeacherStudentController::class, 'showByClass'])
+            ->name('teacher.students.by-class');
+        Route::get('{studentId}', [TeacherStudentController::class, 'show'])
+            ->name('teacher.students.show');
+        Route::get('user/{userId}', [TeacherStudentController::class, 'showByUser']) // ← ADICIONE ESTA
+        ->name('teacher.students.showByUser');
     });
 
     // Notas

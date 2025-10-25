@@ -13,12 +13,11 @@
                 <div class="border rounded p-3 bg-white h-100" style="max-height: 400px; overflow-y: auto;">
                     @if($schoolClass->students->count() > 0)
                         <ul class="list-group">
-                            @foreach($schoolClass->students as $student)
+                            @foreach($schoolClass->students as $userStudent)
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>{{ $student->user->name ?? $student->name }}</span>
-                                    <!-- CORREÇÃO: Use a rota correta para visualizar aluno -->
-                                    <a href="{{ route('teacher.students.show', $student->id) }}" 
-                                       class="btn btn-primary btn-sm">
+                                    <span>{{ $userStudent->name }}</span>
+                                    <a href="{{ route('teacher.students.show', $userStudent->id) }}" 
+                                    class="btn btn-primary btn-sm">
                                         Ver aluno
                                     </a>
                                 </li>
