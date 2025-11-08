@@ -58,16 +58,20 @@
                                             @endif
                                         </small>
                                     </div>
-                                    <div class="d-flex gap-2 align-items-stretch">
+                                    <div class="d-flex gap-2" style="min-width: 140px;">
+                                        <!-- Botão Editar -->
                                         <a href="{{ route('teacher.class.information.edit', ['classId' => $schoolClass->id, 'information' => $info->id]) }}" 
-                                           class="btn btn-sm btn-outline-primary d-flex align-items-center">
+                                           class="btn btn-sm btn-outline-primary flex-fill d-flex align-items-center justify-content-center"
+                                           style="height: 32px;">
                                             Editar
                                         </a>
+                                        <!-- Botão Excluir -->
                                         <form action="{{ route('teacher.class.information.destroy', ['classId' => $schoolClass->id, 'information' => $info->id]) }}" 
-                                              method="POST" class="d-inline">
+                                              method="POST" class="d-flex flex-fill">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                            <button type="submit" class="btn btn-sm btn-outline-danger w-100 d-flex align-items-center justify-content-center"
+                                                    style="height: 32px;"
                                                     onclick="return confirm('Tem certeza que deseja excluir este aviso?')">
                                                 Excluir
                                             </button>

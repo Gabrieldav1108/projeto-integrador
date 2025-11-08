@@ -10,7 +10,7 @@
             <!-- Formulário -->
             <div class="col-12 col-md-5">
                 <div class="border rounded p-3 bg-white h-100">
-                    <form method="POST" action="{{ route('teacher.class.information.update', ['classId' => $schoolClass->id, 'id' => $information->id]) }}" class="w-100 d-flex flex-column">
+                    <form method="POST" action="{{ route('teacher.class.information.update', ['classId' => $schoolClass->id, 'information' => $information->id]) }}" class="w-100 d-flex flex-column">
                         @csrf
                         @method('PUT')
                         <h5 class="text-center"><strong>Editar</strong></h5>

@@ -111,7 +111,7 @@ class ClassInformationController extends Controller
         return view('teacher.editClassInformation', compact('schoolClass', 'information', 'currentInformations'));
     }
 
-    public function update(Request $request, $classId, $id)
+    public function update(Request $request, $classId, $informationId)
     {
         $validated = $request->validate([
             'content' => 'required|string|max:1000',
@@ -121,13 +121,9 @@ class ClassInformationController extends Controller
 
         try {
             $information = ClassInformation::where('class_id', $classId)
-                ->findOrFail($id);
+                ->findOrFail($informationId);
             
-            $information->update([
-                'content' => $validated['content'],
-                'date' => $validated['date'],
-                'time' => $validated['time'],
-            ]);
+            $information->update($validated);
 
             return redirect()
                 ->route('teacher.class.informations', $classId)
