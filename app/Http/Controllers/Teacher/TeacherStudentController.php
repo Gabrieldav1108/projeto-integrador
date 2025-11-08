@@ -26,6 +26,11 @@ class TeacherStudentController extends Controller
                 'schoolClasses.subjects'
             ])->findOrFail($userId);
 
+        // Se não tiver campo age, usar um valor padrão
+        if (!isset($student->age)) {
+            $student->age = 15; // ou qualquer lógica para calcular idade
+        }
+
         $grades = $this->getStudentGrades($student->id);
 
         return view('teacher.studentInformation', compact('student', 'grades'));

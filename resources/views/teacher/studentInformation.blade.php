@@ -148,19 +148,6 @@
                                 <div class="fw-medium">{{ $student->age }} anos</div>
                             </div>
                         </div>
-                        
-                        <div class="d-flex align-items-center mb-3 p-2 bg-light rounded">
-                            <i class="fas fa-users text-primary me-3"></i>
-                            <div>
-                                <div class="text-muted small">Turma</div>
-                                <div class="fw-medium">
-                                    {{ $student->schoolClass ? $student->schoolClass->name : 'N/A' }}
-                                    @if($student->schoolClass && $student->schoolClass->numberClass)
-                                        - {{ $student->schoolClass->numberClass }}
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
 
                         @if($student->schoolClass && $student->schoolClass->teachers->count() > 0)
                         <div class="d-flex align-items-center mb-3 p-2 bg-light rounded">
