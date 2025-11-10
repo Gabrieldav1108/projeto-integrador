@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Teacher extends Model
 {
@@ -14,42 +13,33 @@ class Teacher extends Model
         'name',
         'email',
         'password',
-        'subject_id',
         'phone',
         'hire_date',
         'is_active',
-        'user_id'
-    ];
-
-    protected $hidden = [
-        'password',
-    ];
-
-    protected $casts = [
-        'hire_date' => 'date',
-        'is_active' => 'boolean'
+        'user_id',
+        'subject_id'
     ];
 
     /**
-     * Relacionamento com User
+     * ✅ CORRETO: Relacionamento com o usuário
      */
-    public function user(): BelongsTo
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
 
     /**
-     * Relacionamento com Subject
+     * ✅ CORRETO: Relacionamento com a matéria
      */
-    public function subject(): BelongsTo
+    public function subject()
     {
         return $this->belongsTo(Subject::class);
     }
 
     /**
-     * Relacionamento com SchoolClass (turmas)
+     * ✅ CORRETO: Relacionamento com turmas através da tabela class_teacher
      */
-    public function schoolClasses()
+    public function classes()
     {
         return $this->belongsToMany(SchoolClass::class, 'class_teacher', 'teacher_id', 'class_id')
                     ->withTimestamps();

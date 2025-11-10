@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
@@ -36,21 +37,129 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * 🔄 CORREÇÃO: Relacionamento com turmas como professor através do modelo Teacher
+     */
+    public function teacherClasses()
+    {
+        return $this->hasManyThrough(
+            SchoolClass::class,
+            Teacher::class,
+            'user_id', // Foreign key on teachers table
+            'id', // Foreign key on classes table
+            'id', // Local key on users table
+            'id' // Local key on teachers table
+        )->join('class_teacher', 'classes.id', '=', 'class_teacher.class_id')
+         ->where('class_teacher.teacher_id', '=', DB::raw('teachers.id'));
+    }
+
+    /**
+     * ✅ CORRETO: Relacionamento com turmas como estudante (usando class_user)
+     */
+    public function studentClasses()
+    {
+        return $this->belongsToMany(SchoolClass::class, 'class_user', 'user_id', 'class_id')
+                    ->withTimestamps();
+    }
+
+    /**
+     * ✅ CORRETO: Relacionamento com o perfil do professor
+     */
+    public function teacherProfile()
+    {
+        return $this->hasOne(Teacher::class, 'user_id');
+    }
+
+    /**
+     * 🔄 NOVO: Método otimizado para obter turmas do professor
+     */
+    public function getTeachingClasses()
+    {
+        if (!$this->isTeacher() || !$this->teacherProfile) {
+            return collect();
+        }
+
+        return SchoolClass::whereHas('teachers', function($query) {
+            $query->where('teachers.id', $this->teacherProfile->id);
+        })->with('students')->get();
+    }
+
+    /**
+     * 🔄 NOVO: Contador de alunos para professor
+     */
+    public function getTotalStudentsAttribute()
+    {
+        if (!$this->isTeacher() || !$this->teacherProfile) {
+            return 0;
+        }
+
+        return DB::table('class_teacher')
+            ->join('class_user', 'class_teacher.class_id', '=', 'class_user.class_id')
+            ->join('users', 'class_user.user_id', '=', 'users.id')
+            ->where('class_teacher.teacher_id', $this->teacherProfile->id)
+            ->where('users.role', 'student')
+            ->distinct('users.id')
+            ->count('users.id');
+    }
+
+    /**
+     * Acessor para obter as turmas baseado no role
+     */
+    public function getClassesAttribute()
+    {
+        if ($this->isTeacher()) {
+            return $this->getTeachingClasses();
+        } elseif ($this->isStudent()) {
+            return $this->studentClasses;
+        }
+        
+        return collect();
+    }
+
+    /**
+     * Acessor para a matéria principal do professor
+     */
+    public function getMainSubjectAttribute()
+    {
+        if ($this->isTeacher() && $this->teacherProfile) {
+            return $this->teacherProfile->subject;
+        }
+        return null;
+    }
+
+    /**
+     * Obter matérias como coleção
+     */
+    public function getSubjectsCollectionAttribute()
+    {
+        if ($this->isTeacher() && $this->teacherProfile && $this->teacherProfile->subject) {
+            return collect([$this->teacherProfile->subject]);
+        }
+        
+        return collect();
+    }
+
+    /**
+     * Verificar se o professor tem matéria atribuída
+     */
+    public function hasSubject(): bool
+    {
+        return $this->isTeacher() && $this->teacherProfile && $this->teacherProfile->subject;
+    }
+
     public function getFotoUrlAttribute()
     {
         if ($this->foto) {
-            // Verificar se a foto existe na pasta public/images/profiles
             if (file_exists(public_path('images/profiles/' . $this->foto))) {
                 return asset('images/profiles/' . $this->foto);
             }
         }
         
-        // Foto padrão caso não tenha
         return asset('img/sukuna.jpg');
     }
 
     /**
-     * 🚦 Helpers para checar o papel do usuário
+     * Helpers para checar o papel do usuário
      */
     public function isAdmin(): bool
     {
@@ -68,7 +177,7 @@ class User extends Authenticatable
     }
 
     /**
-     * 🔄 CORREÇÃO: Relacionamento com turmas (MUITOS-PARA-MUITOS)
+     * Relacionamento geral com turmas (para estudantes)
      */
     public function schoolClasses()
     {
@@ -77,16 +186,7 @@ class User extends Authenticatable
     }
 
     /**
-     * 🔄 NOVO: Relacionamento com turmas como professor
-     */
-    public function teachingClasses()
-    {
-        return $this->belongsToMany(SchoolClass::class, 'class_teacher', 'teacher_id', 'class_id')
-                    ->withTimestamps();
-    }
-
-    /**
-     * Helper para obter a primeira turma do estudante (se houver)
+     * Helper para obter a primeira turma do estudante
      */
     public function getFirstClassAttribute()
     {
@@ -101,48 +201,27 @@ class User extends Authenticatable
      */
     public function hasClasses(): bool
     {
-        return $this->schoolClasses()->exists();
+        if ($this->isTeacher()) {
+            return $this->getTeachingClasses()->count() > 0;
+        } elseif ($this->isStudent()) {
+            return $this->studentClasses()->exists();
+        }
+        return false;
     }
 
-    /**
-     * Escopo para professores
-     */
+    // Escopos...
     public function scopeTeachers($query)
     {
         return $query->where('role', 'teacher');
     }
 
-    /**
-     * Escopo para estudantes
-     */
     public function scopeStudents($query)
     {
         return $query->where('role', 'student');
     }
 
-    /**
-     * Escopo para administradores
-     */
     public function scopeAdmins($query)
     {
         return $query->where('role', 'admin');
-    }
-
-    /**
-     * 🔄 NOVO: Escopo para usuários em uma turma específica
-     */
-    public function scopeInClass($query, $classId)
-    {
-        return $query->whereHas('schoolClasses', function($q) use ($classId) {
-            $q->where('classes.id', $classId);
-        });
-    }
-
-    /**
-     * 🔄 NOVO: Escopo para usuários sem turma
-     */
-    public function scopeWithoutClass($query)
-    {
-        return $query->whereDoesntHave('schoolClasses');
     }
 }

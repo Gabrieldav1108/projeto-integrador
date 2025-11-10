@@ -7,6 +7,7 @@ use App\Http\Controllers\ClassInformationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\Teacher\GradeController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\Teacher\TeacherStudentController;
 use Illuminate\Support\Facades\Route;
@@ -115,12 +116,15 @@ Route::prefix('teacher')->middleware(['auth', 'role:teacher'])->group(function()
     });
 
     // Notas
-    Route::get('grades', function(){
-        return view('teacher.editStudentGrade');
-    })->name('teacher.grades.index');
+    Route::prefix('grades')->group(function () {
+        Route::get('/student/{studentId}/create', [GradeController::class, 'create'])->name('teacher.grades.create');
+        Route::post('/student/{studentId}', [GradeController::class, 'store'])->name('teacher.grades.store');
+        Route::get('/student/{studentId}/edit/{gradeId}', [GradeController::class, 'edit'])->name('teacher.grades.edit');
+        Route::put('/student/{studentId}/{gradeId}', [GradeController::class, 'update'])->name('teacher.grades.update');
+        Route::delete('/student/{studentId}/{gradeId}', [GradeController::class, 'destroy'])->name('teacher.grades.destroy');
+    });
 
-    // Horários
-    Route::get('schedules', function () {
+        Route::get('schedules', function(){
         return view('teacher.schedules');
     })->name('teacher.schedules');
 });

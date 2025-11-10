@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
+use App\Models\Grade;
 use App\Models\User;
 use App\Models\SchoolClass;
 use Illuminate\Http\Request;
@@ -36,24 +37,42 @@ class TeacherStudentController extends Controller
         return view('teacher.studentInformation', compact('student', 'grades'));
     }
 
+    // No método show do TeacherStudentController
     private function getStudentGrades($studentId)
     {
+        $grades = Grade::where('student_id', $studentId)
+            ->with('subject')
+            ->get()
+            ->groupBy('trimester');
+
         return [
-            'first_trimester' => [
-                ['name' => 'Prova 1', 'grade' => 8.5],
-                ['name' => 'Prova 2', 'grade' => 7.8],
-                ['name' => 'Prova 3', 'grade' => 9.2],
-            ],
-            'second_trimester' => [
-                ['name' => 'Prova 1', 'grade' => 6.7],
-                ['name' => 'Prova 2', 'grade' => 8.9],
-                ['name' => 'Prova 3', 'grade' => 7.5],
-            ],
-            'third_trimester' => [
-                ['name' => 'Prova 1', 'grade' => 9.0],
-                ['name' => 'Prova 2', 'grade' => 8.2],
-                ['name' => 'Prova 3', 'grade' => 9.5],
-            ]
+            'first_trimester' => $grades->get('first_trimester', collect())->map(function($grade) {
+                return [
+                    'id' => $grade->id, // ← Adicionar o ID
+                    'name' => $grade->assessment_name,
+                    'grade' => $grade->grade,
+                    'weight' => $grade->weight,
+                    'subject' => $grade->subject->name
+                ];
+            })->toArray(),
+            'second_trimester' => $grades->get('second_trimester', collect())->map(function($grade) {
+                return [
+                    'id' => $grade->id, // ← Adicionar o ID
+                    'name' => $grade->assessment_name,
+                    'grade' => $grade->grade,
+                    'weight' => $grade->weight,
+                    'subject' => $grade->subject->name
+                ];
+            })->toArray(),
+            'third_trimester' => $grades->get('third_trimester', collect())->map(function($grade) {
+                return [
+                    'id' => $grade->id, // ← Adicionar o ID
+                    'name' => $grade->assessment_name,
+                    'grade' => $grade->grade,
+                    'weight' => $grade->weight,
+                    'subject' => $grade->subject->name
+                ];
+            })->toArray(),
         ];
     }
 

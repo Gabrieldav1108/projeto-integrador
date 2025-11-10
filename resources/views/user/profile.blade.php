@@ -107,31 +107,60 @@
                             @elseif($user->role === 'teacher')
                                 <!-- Estatísticas para Professor -->
                                 @php
-                                    $teacherClasses = $user->classes ? $user->classes->count() : 0;
-                                    $totalStudents = 0;
-                                    if ($user->classes) {
-                                        $totalStudents = $user->classes->sum(function($class) {
-                                            return $class->students_count ?? 0;
-                                        });
-                                    }
+                                    // Usa os novos métodos personalizados
+                                    $teacherClasses = $user->getTeachingClasses();
+                                    $totalClasses = $teacherClasses->count();
+                                    $totalStudents = $user->total_students;
+                                    $mainSubject = $user->main_subject;
                                 @endphp
                                 
-                                <p><strong>Turmas Ativas:</strong> {{ $teacherClasses }}</p>
-                                <p><strong>Total de Alunos:</strong> {{ $totalStudents }}</p>
+                                <p><strong>Turmas Ativas:</strong> 
+                                    @if($totalClasses > 0)
+                                        {{ $totalClasses }}
+                                    @else
+                                        <span class="text-warning">Nenhuma turma atribuída</span>
+                                    @endif
+                                </p>
+                                
+                                <p><strong>Total de Alunos:</strong> 
+                                    @if($totalStudents > 0)
+                                        {{ $totalStudents }}
+                                    @else
+                                        <span class="text-muted">0</span>
+                                    @endif
+                                </p>
+                                
                                 <p><strong>Próxima Aula:</strong> 
-                                    @if($teacherClasses > 0)
+                                    @if($totalClasses > 0)
                                         <a href="{{ route('teacher.schedules') }}">Ver horários</a>
                                     @else
                                         <span class="text-muted">Nenhuma turma</span>
                                     @endif
                                 </p>
-                                <p><strong>Disciplinas:</strong> 
-                                    @if($teacherClasses > 0 && $user->classes)
-                                        {{ $user->classes->unique('subject')->count() }}
+                                
+                                <p><strong>Disciplina Principal:</strong> 
+                                    @if($mainSubject)
+                                        <span class="badge bg-primary me-1">{{ $mainSubject->name }}</span>
                                     @else
-                                        <span class="text-muted">Nenhuma</span>
+                                        <span class="text-warning">Nenhuma disciplina atribuída</span>
                                     @endif
                                 </p>
+                                
+                                <!-- Mostra as turmas específicas se houver -->
+                                @if($totalClasses > 0)
+                                    <div class="mt-3">
+                                        <strong>Turmas:</strong>
+                                        <ul class="list-unstyled mt-2">
+                                            @foreach($teacherClasses as $class)
+                                                <li>
+                                                    <i class="fas fa-chalkboard me-2"></i>
+                                                    {{ $class->name }} 
+                                                    <span class="badge bg-secondary ms-2">{{ $class->students_count }} alunos</span>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endif
                                 
                             @else
                                 <!-- Estatísticas para Estudante -->
@@ -198,12 +227,6 @@
                                         <i class="fas fa-calendar-alt"></i> Meus Horários
                                     </a>
                                 </div>
-                                <div class="col-md-4">
-                                    <a href="{{ route('teacher.grades.index') }}" class="btn btn-outline-info w-100">
-                                        <i class="fas fa-graduation-cap"></i> Lançar Notas
-                                    </a>
-                                </div>
-                                
                             @else
                                 <div class="col-md-6">
                                     <a href="{{ route('student.classes.index') }}" class="btn btn-outline-primary w-100">

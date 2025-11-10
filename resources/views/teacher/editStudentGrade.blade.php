@@ -1,6 +1,6 @@
 <x-app-layout>
     @slot('title', 'Editar nota')
-    <x-header/>
+    <x-teacher-header/>
 
     <section class="container p-3 mt-5 rounded-4 mx-auto" style="background-color: #cfe2ff; max-width: 600px; width: 100%;">
         <h2 class="bold">Editar nota: ???</h2>

@@ -17,17 +17,19 @@ class SchoolClass extends Model
         'numberClass',
     ];
 
-    public function classInformations(): HasMany
+    /**
+     * 🔄 CORREÇÃO: Relacionamento com professores através da tabela class_teacher
+     * Agora usando o modelo Teacher
+     */
+    public function teachers()
     {
-        return $this->hasMany(ClassInformation::class, 'class_id');
-    }
-    public function subjects()
-    {
-        return $this->belongsToMany(Subject::class, 'class_subject', 'class_id', 'subject_id')
+        return $this->belongsToMany(Teacher::class, 'class_teacher', 'class_id', 'teacher_id')
                     ->withTimestamps();
     }
 
-    // Manter students para controle de matrícula
+    /**
+     * ✅ CORRETO: Relacionamento com estudantes através da tabela class_user
+     */
     public function students()
     {
         return $this->belongsToMany(User::class, 'class_user', 'class_id', 'user_id')
@@ -35,11 +37,25 @@ class SchoolClass extends Model
                     ->withTimestamps();
     }
 
-    public function teachers()
+    /**
+     * Relacionamento com matérias
+     */
+    public function subjects()
     {
-        return $this->belongsToMany(Teacher::class, 'class_teacher', 'class_id', 'teacher_id')
+        return $this->belongsToMany(Subject::class, 'class_subject', 'class_id', 'subject_id')
                     ->withTimestamps();
     }
-    
-   
+
+    public function classInformations(): HasMany
+    {
+        return $this->hasMany(ClassInformation::class, 'class_id');
+    }
+
+    /**
+     * Contador de estudantes
+     */
+    public function getStudentsCountAttribute()
+    {
+        return $this->students()->count();
+    }
 }
