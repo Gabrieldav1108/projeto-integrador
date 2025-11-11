@@ -131,20 +131,15 @@ Route::prefix('teacher')->middleware(['auth', 'role:teacher'])->group(function()
 //-------------------- STUDENT --------------------
 Route::prefix('student')->middleware(['auth', 'role:student'])->group(function() {
     Route::get('home', [HomeController::class, 'indexStudent'])->name('student.home');
-    Route::get('dashboard', [HomeController::class, 'indexStudent'])->name('student.dashboard');
-    
-    // Turmas do estudante
-    Route::get('classes', [StudentController::class, 'index'])->name('student.classes.index');
-    Route::get('class/{classId}', [StudentController::class, 'show'])->name('student.class.show');
+    Route::get('dashboard', [HomeController::class, 'indexStudent'])->name('student.dashboard');   
 
     // Matérias do estudante  
        Route::get('subject/{subjectId}', [StudentController::class, 'showSubject'])
         ->name('student.subject.show');
 
     // Minhas Notas
-    Route::get('grades', function () {
-        return view('student.classGrade');
-    })->name('student.grades.index');
+    Route::get('/grades', [StudentController::class, 'showGrades'])->name('grades.index');
+    Route::get('/grades/subject/{subjectId}', [StudentController::class, 'showGrades'])->name('grades.subject');
 
     // Meus Horários
     Route::get('schedules', function(){

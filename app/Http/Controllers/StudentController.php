@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Grade;
 use App\Models\Student;
 use App\Models\User;
 use App\Models\SchoolClass;
@@ -62,6 +63,46 @@ class StudentController extends Controller
             'mainTeacher', 
             'userClasses'
         ));
+    }
+
+    public function showGrades($subjectId = null)
+    {
+        $user = Auth::user();
+        
+        // Se não foi passada uma matéria específica, busca todas as matérias do aluno
+        if ($subjectId) {
+            // Buscar notas de uma matéria específica
+            $subject = Subject::with(['teachers', 'schoolClasses.students'])->findOrFail($subjectId);
+            
+            // Verificar se o aluno está matriculado nesta matéria
+            $isStudentInSubject = $subject->schoolClasses()
+                ->whereHas('students', function($query) use ($user) {
+                    $query->where('users.id', $user->id);
+                })->exists();
+
+            if (!$isStudentInSubject) {
+                abort(403, 'Você não está matriculado nesta matéria.');
+            }
+
+            // Buscar as notas do aluno nesta matéria
+            $grades = Grade::where('student_id', $user->id)
+                ->where('subject_id', $subjectId)
+                ->get()
+                ->groupBy('trimester');
+
+            $subjects = collect([$subject]);
+        } else {
+            // Buscar todas as matérias do aluno com suas notas
+            $subjects = Subject::whereHas('schoolClasses.students', function($query) use ($user) {
+                $query->where('users.id', $user->id);
+            })->with(['teachers'])->get();
+
+            $grades = \App\Models\Grade::where('student_id', $user->id)
+                ->get()
+                ->groupBy(['subject_id', 'trimester']);
+        }
+
+        return view('student.grades', compact('subjects', 'grades', 'subjectId'));
     }
 
     public function create()

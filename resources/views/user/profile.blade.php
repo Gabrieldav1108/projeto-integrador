@@ -233,7 +233,7 @@
                                     </a>
                                 </div>
                                 <div class="col-md-6">
-                                    <a href="{{ route('student.grades.index') }}" class="btn btn-outline-success w-100">
+                                    <a href="{{ route('grades.index') }}" class="btn btn-outline-success w-100">
                                         <i class="fas fa-chart-line"></i> Meu Desempenho
                                     </a>
                                 </div>
