@@ -15,9 +15,17 @@ class Subject extends Model
         'description',
     ];
 
-    public function teachers(): HasMany
+    public function teachers()
     {
-        return $this->hasMany(Teacher::class);
+        return $this->hasMany(Teacher::class, 'subject_id');
+    }
+    public function getMainTeacherAttribute()
+    {
+        return $this->teachers->first();
+    }
+    public function getHasTeachersAttribute()
+    {
+        return $this->teachers->count() > 0;
     }
 
     public function schoolClasses()

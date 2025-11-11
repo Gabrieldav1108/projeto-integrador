@@ -100,64 +100,7 @@
                     @endif
                 </div>
             </div>
-        </div>
+        </div>        
 
-        <!-- Turmas do estudante nesta matéria -->
-        @if($userClasses->count() > 0)
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card bg-light">
-                    <div class="card-body">
-                        <h5 class="card-title">🏫 Minhas Turmas nesta Matéria</h5>
-                        <div class="row">
-                            @foreach($userClasses as $class)
-                                <div class="col-md-4 mb-3">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <h6>{{ $class->name }}</h6>
-                                            <p class="small text-muted mb-2">
-                                                Código: {{ $class->numberClass }}
-                                            </p>
-                                            @if($class->teachers->count() > 0)
-                                                <p class="small mb-1">
-                                                    <strong>Professores:</strong>
-                                                    {{ $class->teachers->pluck('name')->implode(', ') }}
-                                                </p>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        @endif
-
-        <!-- Informações adicionais da matéria -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card bg-light">
-                    <div class="card-body">
-                        <h5 class="card-title">📊 Informações da Matéria</h5>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <strong>🏫 Turmas com esta matéria:</strong> 
-                                {{ $subject->schoolClasses->count() }}
-                            </div>
-                            <div class="col-md-4">
-                                <strong>👨‍🏫 Professores:</strong> 
-                                {{ $subject->teachers->count() }}
-                            </div>
-                            <div class="col-md-4">
-                                <strong>📢 Avisos ativos:</strong> 
-                                {{ $subject->classInformations->count() }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </section>
 </x-app-layout>

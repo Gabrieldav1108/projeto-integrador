@@ -171,7 +171,6 @@
                                 @endphp
                                 
                                 <p><strong>Turmas Matriculadas:</strong> {{ $studentClasses }}</p>
-                                <p><strong>Tarefas Concluídas:</strong> {{ $completedAssignments }}</p>
                                 <p><strong>Média Geral:</strong> {{ $averageGrade }}</p>
                                 <p><strong>Próxima Aula:</strong> 
                                     @if($studentClasses > 0)
@@ -218,7 +217,7 @@
                                 
                             @elseif($user->role === 'teacher')
                                 <div class="col-md-4">
-                                    <a href="{{ route('teacher.classes.index') }}" class="btn btn-outline-primary w-100">
+                                    <a href="{{ route('teacher.home') }}" class="btn btn-outline-primary w-100">
                                         <i class="fas fa-chalkboard"></i> Minhas Turmas
                                     </a>
                                 </div>
@@ -227,9 +226,9 @@
                                         <i class="fas fa-calendar-alt"></i> Meus Horários
                                     </a>
                                 </div>
-                            @else
+                            @elseif($user->role === 'student')
                                 <div class="col-md-6">
-                                    <a href="{{ route('student.classes.index') }}" class="btn btn-outline-primary w-100">
+                                    <a href="{{ route('student.home') }}" class="btn btn-outline-primary w-100">
                                         <i class="fas fa-chalkboard"></i> Minhas Turmas
                                     </a>
                                 </div>

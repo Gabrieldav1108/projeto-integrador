@@ -1,0 +1,25 @@
+[90m= [39m[34;4mApp\Models\Subject[39;24m {#6286
+    [34mid[39m: [35m4[39m,
+    [34mname[39m: "[32mGeografia[39m",
+    [34mdescription[39m: "[32mGeografia física e humana[39m",
+    [34mcreated_at[39m: "[32m2025-10-12 21:57:14[39m",
+    [34mupdated_at[39m: "[32m2025-10-12 21:57:14[39m",
+    [34mteachers[39m: [34;4mIlluminate\Database\Eloquent\Collection[39;24m {#5302
+      [34mall[39m: [
+        [34;4mApp\Models\Teacher[39;24m {#6058
+          [34mid[39m: [35m1[39m,
+          [34mcreated_at[39m: "[32m2025-10-12 23:52:53[39m",
+          [34mupdated_at[39m: "[32m2025-10-12 23:52:53[39m",
+          [34mname[39m: "[32mSofia Muller David[39m",
+          [34memail[39m: "[32msofia@email.com[39m",
+          [34mpassword[39m: "[32m$2y$12$nFA/nEbzNsFhs4iisF3hUeq15XbnMZrlEIdoNxcqbdQS1rST7KAAS[39m",
+          [34mphone[39m: "[32m51998133842[39m",
+          [34mhire_date[39m: "[32m2025-10-12 00:00:00[39m",
+          [34mis_active[39m: [35m1[39m,
+          [34muser_id[39m: [35m8[39m,
+          [34msubject_id[39m: [35m4[39m,
+        },
+      ],
+    },
+  }
+

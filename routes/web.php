@@ -81,7 +81,6 @@ Route::prefix('teacher')->middleware(['auth', 'role:teacher'])->group(function()
     
     // Turmas do Professor
     Route::prefix('classes')->group(function() {
-        Route::get('/', [ClassController::class, 'teacherClasses'])->name('teacher.classes.index');
         Route::get('{classId}', [ClassController::class, 'show'])->name('teacher.classes.show');
     });
 

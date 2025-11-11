@@ -25,19 +25,19 @@ class StudentController extends Controller
         return view('teacher.students.show', compact('student'));
     }
 
-        public function showSubject($subjectId)
+    public function showSubject($subjectId)
     {
-        // Buscar a matéria com turmas, professores e avisos
+        // Buscar a matéria com os relacionamentos corretos
         $subject = Subject::with([
-            'schoolClasses.teachers',
             'schoolClasses.students',
+            'schoolClasses.teachers.user',
             'classInformations' => function($query) {
                 $query->active()->latest();
             },
-            'teachers'
+            'teachers.user' // Professores específicos desta matéria
         ])->findOrFail($subjectId);
 
-        // Verificar se o estudante está matriculado em alguma turma desta matéria
+        // Verificar se o estudante está matriculado
         $user = Auth::user();
         $isStudentInSubject = $subject->schoolClasses()
             ->whereHas('students', function($query) use ($user) {
@@ -48,9 +48,9 @@ class StudentController extends Controller
             abort(403, 'Você não está matriculado nesta matéria.');
         }
 
-        // Buscar o professor desta matéria
+        // 🔥 CORREÇÃO: Buscar APENAS professores desta matéria específica
         $mainTeacher = $subject->teachers->first();
-        
+
         // Buscar turmas do estudante nesta matéria
         $userClasses = $subject->schoolClasses()
             ->whereHas('students', function($query) use ($user) {

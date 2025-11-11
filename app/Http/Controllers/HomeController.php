@@ -73,14 +73,14 @@ class HomeController extends Controller
         $teacher = \App\Models\Teacher::where('user_id', $user->id)->first();
         
         if ($teacher) {
-            $schoolClasses = $teacher->schoolClasses()->withCount('students')->get();
-            
-            logger('Professor: ' . $teacher->name);
-            logger('Turmas encontradas: ' . $schoolClasses->count());
-            foreach($schoolClasses as $class) {
-                logger('Turma: ' . $class->name . ' - Alunos: ' . $class->students_count);
-            }
-        } else {
+                $schoolClasses = $teacher->schoolClasses()->withCount('students')->get();
+                
+                logger('Professor: ' . $teacher->name);
+                logger('Turmas encontradas: ' . $schoolClasses->count());
+                foreach($schoolClasses as $class) {
+                    logger('Turma: ' . $class->name . ' - Alunos: ' . $class->students_count);
+                }
+            } else {
             $schoolClasses = collect();
             logger('Professor não encontrado para user_id: ' . $user->id);
         }

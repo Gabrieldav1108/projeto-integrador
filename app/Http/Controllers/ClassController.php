@@ -97,4 +97,5 @@ class ClassController extends Controller
         return redirect()->route('admin.classes.index')
                          ->with('success', 'Turma removida com sucesso!');
     }
+
 }

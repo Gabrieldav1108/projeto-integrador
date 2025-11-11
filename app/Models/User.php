@@ -27,6 +27,7 @@ class User extends Authenticatable
 
     protected $appends = [
         'foto_url',
+        'total_students', // 🔥 ADICIONANDO O APPEND QUE ESTAVA FALTANDO
     ];
 
     protected function casts(): array
@@ -38,7 +39,7 @@ class User extends Authenticatable
     }
 
     /**
-     * 🔄 CORREÇÃO: Relacionamento com turmas como professor através do modelo Teacher
+     * Relacionamento com turmas como professor através do modelo Teacher
      */
     public function teacherClasses()
     {
@@ -54,7 +55,7 @@ class User extends Authenticatable
     }
 
     /**
-     * ✅ CORRETO: Relacionamento com turmas como estudante (usando class_user)
+     * Relacionamento com turmas como estudante (usando class_user)
      */
     public function studentClasses()
     {
@@ -63,7 +64,7 @@ class User extends Authenticatable
     }
 
     /**
-     * ✅ CORRETO: Relacionamento com o perfil do professor
+     * Relacionamento com o perfil do professor
      */
     public function teacherProfile()
     {
@@ -71,7 +72,7 @@ class User extends Authenticatable
     }
 
     /**
-     * 🔄 NOVO: Método otimizado para obter turmas do professor
+     * 🔥 MÉTODO CORRIGIDO: Para obter turmas do professor
      */
     public function getTeachingClasses()
     {
@@ -79,13 +80,12 @@ class User extends Authenticatable
             return collect();
         }
 
-        return SchoolClass::whereHas('teachers', function($query) {
-            $query->where('teachers.id', $this->teacherProfile->id);
-        })->with('students')->get();
+        // Usa o método schoolClasses do modelo Teacher
+        return $this->teacherProfile->schoolClasses()->with('students')->get();
     }
 
     /**
-     * 🔄 NOVO: Contador de alunos para professor
+     * 🔥 MÉTODO CORRIGIDO: Contador de alunos para professor
      */
     public function getTotalStudentsAttribute()
     {
@@ -223,5 +223,13 @@ class User extends Authenticatable
     public function scopeAdmins($query)
     {
         return $query->where('role', 'admin');
+    }
+
+    /**
+     * 🔥 MÉTODO QUE ESTAVA FALTANDO: Para HomeController
+     */
+    public function getTeacherProfile()
+    {
+        return $this->teacherProfile;
     }
 }

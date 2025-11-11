@@ -5,7 +5,7 @@
     <section class="container p-4 mt-5 rounded-4" style="background-color: #cfe2ff">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="text-center text-md-start mb-0">Informações do aluno</h2>
-            <a href="{{ route('teacher.students.index') }}" class="btn btn-secondary">
+            <a href="javascript:history.back()" class="btn btn-secondary">
                 ← Voltar para lista
             </a>
         </div>
