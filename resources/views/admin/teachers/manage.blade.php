@@ -22,7 +22,6 @@
                         <th>Email</th>
                         <th>Matéria</th>
                         <th>Telefone</th>
-                        <th>Data de Contratação</th>
                         <th>Status</th>
                         <th class="text-center">Ações</th>
                     </tr>
@@ -40,7 +39,6 @@
                             @endif
                         </td>
                         <td>{{ $teacher->phone ?? 'N/A' }}</td>
-                        <td>{{ $teacher->hire_date->format('d/m/Y') }}</td>
                         <td>
                             <span class="badge {{ $teacher->is_active ? 'bg-success' : 'bg-danger' }}">
                                 {{ $teacher->is_active ? 'Ativo' : 'Inativo' }}

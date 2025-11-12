@@ -35,13 +35,6 @@
                             <span class="ms-2">{{ $mainTeacher->phone }}</span>
                         </div>
                         @endif
-                        
-                        @if($mainTeacher->specialty)
-                        <div class="mb-3">
-                            <strong>🎓 Especialidade:</strong> 
-                            <span class="ms-2">{{ $mainTeacher->specialty }}</span>
-                        </div>
-                        @endif
                     @else
                         <div class="text-center text-muted py-5">
                             <i class="fas fa-user-slash fa-3x mb-3"></i>
@@ -60,14 +53,16 @@
             <!-- Avisos do professor -->
             <div class="col-12 col-md-6 d-flex flex-column">
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
-                    <h3 class="mb-2 mb-md-0">Avisos do professor</h3>
+                    <h3 class="mb-2 mb-md-0">
+                        Avisos do professor 
+                    </h3>
                     <a href="{{ route('grades.subject', $subject->id) }}" class="btn btn-primary w-md-auto">Notas</a>
                 </div>
 
                 <div class="border rounded p-3 bg-light h-100">
-                    @if($subject->classInformations->count() > 0)
+                    @if($classInformations->count() > 0)
                         <ul class="list-group">
-                            @foreach($subject->classInformations as $info)
+                            @foreach($classInformations as $info)
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <div class="flex-grow-1">
                                         <strong>{{ $info->content }}</strong>
@@ -95,12 +90,36 @@
                     @else
                         <div class="text-center py-4 text-muted">
                             <i class="fas fa-bell-slash fa-2x mb-3"></i>
-                            <p>Nenhum aviso disponível no momento.</p>
+                            <p>Nenhum aviso disponível para suas turmas.</p>
                         </div>
                     @endif
                 </div>
             </div>
         </div>        
 
+        <!-- Informações adicionais -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h5 class="card-title">📊 Resumo</h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <strong>🏫 Suas Turmas:</strong> 
+                                {{ $userClasses->count() }}
+                            </div>
+                            <div class="col-md-4">
+                                <strong>👨‍🏫 Professor:</strong> 
+                                {{ $mainTeacher ? $mainTeacher->name : 'Não atribuído' }}
+                            </div>
+                            <div class="col-md-4">
+                                <strong>📢 Avisos:</strong> 
+                                {{ $classInformations->count() }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 </x-app-layout>

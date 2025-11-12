@@ -99,7 +99,6 @@
                             <!-- Conteúdo Dinâmico por Tipo de Usuário -->
                             @if($user->role === 'admin')
                                 <!-- Estatísticas para Admin -->
-                                <p><strong>Total de Usuários:</strong> {{ $stats['total_users'] ?? 0 }}</p>
                                 <p><strong>Total de Turmas:</strong> {{ $stats['total_classes'] ?? 0 }}</p>
                                 <p><strong>Professores Cadastrados:</strong> {{ $stats['total_teachers'] ?? 0 }}</p>
                                 <p><strong>Estudantes Cadastrados:</strong> {{ $stats['total_students'] ?? 0 }}</p>

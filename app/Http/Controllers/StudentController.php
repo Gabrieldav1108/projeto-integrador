@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ClassInformation;
 use App\Models\Grade;
 use App\Models\Student;
 use App\Models\User;
@@ -35,10 +36,10 @@ class StudentController extends Controller
             'classInformations' => function($query) {
                 $query->active()->latest();
             },
-            'teachers.user' // Professores específicos desta matéria
+            'teachers.user'
         ])->findOrFail($subjectId);
 
-        // Verificar se o estudante está matriculado
+        // Verificar se o estudante está matriculado nesta matéria
         $user = Auth::user();
         $isStudentInSubject = $subject->schoolClasses()
             ->whereHas('students', function($query) use ($user) {
@@ -49,19 +50,28 @@ class StudentController extends Controller
             abort(403, 'Você não está matriculado nesta matéria.');
         }
 
-        // 🔥 CORREÇÃO: Buscar APENAS professores desta matéria específica
-        $mainTeacher = $subject->teachers->first();
-
-        // Buscar turmas do estudante nesta matéria
+        // Buscar APENAS as turmas do aluno nesta matéria
         $userClasses = $subject->schoolClasses()
             ->whereHas('students', function($query) use ($user) {
                 $query->where('users.id', $user->id);
             })->get();
 
+        //Buscar avisos APENAS das turmas do aluno
+        $classIds = $userClasses->pluck('id');
+        $classInformations = ClassInformation::whereIn('class_id', $classIds)
+            ->where('subject_id', $subjectId)
+            ->active()
+            ->latest()
+            ->get();
+
+        // Buscar professor desta matéria
+        $mainTeacher = $subject->teachers->first();
+
         return view('student.classInformation', compact(
             'subject', 
             'mainTeacher', 
-            'userClasses'
+            'userClasses',
+            'classInformations' // 🔥 Enviar avisos filtrados
         ));
     }
 

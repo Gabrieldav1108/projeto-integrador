@@ -21,8 +21,6 @@ class ProfileController extends Controller
             // Carrega o perfil do professor com a matéria
             $user->load(['teacherProfile.subject']);
             
-            // Não usa mais o carregamento eager de teacherClasses pois agora é complexo
-            // Os dados serão carregados pelos métodos personalizados
         } elseif ($user->role === 'student') {
             $user->load(['studentClasses']);
         }
