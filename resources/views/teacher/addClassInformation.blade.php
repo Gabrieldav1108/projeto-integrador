@@ -1,5 +1,5 @@
 <x-app-layout>
-    @slot('title', 'Adicionar informações - {{ $schoolClass->name }}')
+    @slot('title', 'Adicionar informações - ' . $schoolClass->name)
 
     <x-teacher-header/>
     
@@ -46,7 +46,7 @@
         <!-- Informações atuais -->
         <div class="col-12 col-md-6">
             <div class="border rounded p-3 bg-light h-100 d-flex flex-column">
-                <h5 class="text-center mb-3">Informações atuais (ativas)</h5>
+                <h5 class="text-center mb-3">Informações atuais</h5>
                 @if($currentInformations->count() > 0)
                     <ul class="list-group">
                         @foreach($currentInformations as $info)
@@ -65,19 +65,24 @@
                                         <span class="badge bg-success ms-2">Ativo</span>
                                     @endif
                                 </div>
-                                <div class="d-flex gap-1">
-                                    <a href="{{ route('teacher.class.information.edit', ['classId' => $schoolClass->id, 'id' => $info->id]) }}" 
-                                    class="btn btn-sm btn-outline-primary">Editar</a>
-                                    <form action="{{ route('teacher.class.information.destroy', ['classId' => $schoolClass->id, 'id' => $info->id]) }}" 
-                                        method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" 
-                                                onclick="return confirm('Tem certeza que deseja excluir este aviso?')">
-                                            Excluir
-                                        </button>
-                                    </form>
+                                <div class="d-flex gap-2">
+                                    <a href="{{ route('teacher.class.information.edit', ['classId' => $schoolClass->id, 'information' => $info->id]) }}" 
+                                    class="btn btn-outline-primary btn-sm w-50 text-center">
+                                        <i class="fas fa-edit me-1"></i>Editar
+                                    </a>
+                                    <button type="button" 
+                                            class="btn btn-outline-danger btn-sm w-50 text-center"
+                                            onclick="if(confirm('Tem certeza que deseja excluir este aviso?')) { document.getElementById('delete-form-{{ $info->id }}').submit(); }">
+                                        <i class="fas fa-trash me-1"></i>Excluir
+                                    </button>
                                 </div>
+
+                                <form id="delete-form-{{ $info->id }}" 
+                                    action="{{ route('teacher.class.information.destroy', ['classId' => $schoolClass->id, 'information' => $info->id]) }}" 
+                                    method="POST" class="d-none">
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
                             </li>
                         @endforeach
                     </ul>

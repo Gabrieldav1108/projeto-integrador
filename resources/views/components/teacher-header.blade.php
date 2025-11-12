@@ -10,7 +10,6 @@
                 <div class="collapse navbar-collapse justify-content-between px-lg-3" id="navbarCollapse">
                     <div class="navbar-nav mx-auto py-0">
                         <a href={{route('teacher.home')}} class="nav-item nav-link active">Minhas turmas</a>
-                        <a href={{route('teacher.schedules')}} class="nav-item nav-link">Horários</a>
                         <a href={{route('profile')}} class="nav-item nav-link">Perfil</a>
                     </div>
                 </div>

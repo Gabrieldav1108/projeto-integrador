@@ -6,6 +6,7 @@ use App\Http\Controllers\ClassController;
 use App\Http\Controllers\ClassInformationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StudentAssignmentController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\Teacher\GradeController;
 use App\Http\Controllers\TeacherController;
@@ -98,6 +99,21 @@ Route::prefix('teacher')->middleware(['auth', 'role:teacher'])->group(function()
             ->name('teacher.class.information.update');
         Route::delete('/information/{information}', [ClassInformationController::class, 'destroy'])
             ->name('teacher.class.information.destroy');
+
+
+        //trabalhos
+        Route::get('/assignments', [ClassInformationController::class, 'showAssignments'])
+        ->name('assignments');
+        Route::get('/assignment/create', [ClassInformationController::class, 'createAssignment'])
+        ->name('assignment.create');
+        Route::post('/assignment/store', [ClassInformationController::class, 'storeAssignment'])
+        ->name('assignment.store');
+        Route::get('/assignment/{assignmentId}/submissions', [ClassInformationController::class, 'showSubmissions'])
+        ->name('assignment.submissions');
+        Route::post('/assignment/{assignmentId}/submission/{submissionId}/grade', [ClassInformationController::class, 'gradeSubmission'])
+        ->name('assignment.submission.grade');
+        Route::get('/assignment/{assignmentId}/submission/{submissionId}/download', [ClassInformationController::class, 'downloadSubmission'])
+        ->name('assignment.submission.download');
     });
 
     // Estudantes - AGORA USANDO O CONTROLLER DO PROFESSOR
@@ -131,7 +147,28 @@ Route::prefix('teacher')->middleware(['auth', 'role:teacher'])->group(function()
 //-------------------- STUDENT --------------------
 Route::prefix('student')->middleware(['auth', 'role:student'])->group(function() {
     Route::get('home', [HomeController::class, 'indexStudent'])->name('student.home');
-    Route::get('dashboard', [HomeController::class, 'indexStudent'])->name('student.dashboard');   
+    Route::get('dashboard', [HomeController::class, 'indexStudent'])->name('student.dashboard'); 
+    
+    Route::get('/assignments', [StudentAssignmentController::class, 'index'])
+    ->name('student.assignments');
+    
+    // Trabalhos por matéria
+    Route::get('/assignments/subject/{subjectId}', [StudentAssignmentController::class, 'showSubjectAssignments'])
+    ->name('student.assignments.subject');
+    
+    // Detalhes do trabalho
+    Route::get('/assignment/{assignmentId}', [StudentAssignmentController::class, 'show'])
+    ->name('student.assignment.show');
+    
+    // Entrega do trabalho
+    Route::get('/assignment/{assignmentId}/submit', [StudentAssignmentController::class, 'createSubmission'])
+    ->name('student.assignment.submit');
+    Route::post('/assignment/{assignmentId}/submit', [StudentAssignmentController::class, 'storeSubmission'])
+    ->name('student.assignment.submit.store');
+    
+    // Minhas entregas
+    Route::get('/my-submissions', [StudentAssignmentController::class, 'mySubmissions'])
+    ->name('student.submissions');
 
     // Matérias do estudante  
        Route::get('subject/{subjectId}', [StudentController::class, 'showSubject'])

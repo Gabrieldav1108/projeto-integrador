@@ -47,7 +47,7 @@
             <!-- Informações atuais -->
             <div class="col-12 col-md-6">
                 <div class="border rounded p-3 bg-light h-100 d-flex flex-column">
-                    <h5 class="text-center mb-3">Informações atuais (ativas)</h5>
+                    <h5 class="text-center mb-3">Informações atuais </h5>
                     @if($currentInformations->count() > 0)
                         <ul class="list-group">
                             @foreach($currentInformations as $info)

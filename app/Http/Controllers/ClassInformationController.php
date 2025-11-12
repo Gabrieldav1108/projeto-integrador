@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Assignment;
+use App\Models\AssignmentSubmission;
 use App\Models\ClassInformation;
 use App\Models\SchoolClass;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\Subject;
+use Illuminate\Container\Attributes\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage as FacadesStorage;
 
 class ClassInformationController extends Controller
 {
@@ -152,5 +156,149 @@ class ClassInformationController extends Controller
             return back()
                 ->with('error', 'Erro ao excluir aviso. Tente novamente.');
         }
+    }
+
+    public function showAssignments($classId)
+    {
+        $schoolClass = SchoolClass::with(['students'])->findOrFail($classId);
+        
+        $assignments = Assignment::where('class_id', $classId)
+            ->with(['submissions.student', 'teacher.user'])
+            ->active()
+            ->latest()
+            ->get();
+
+        return view('teacher.assignment-submissions', compact('schoolClass', 'assignments'));
+    }
+
+    /**
+     * CRIAR NOVO TRABALHO
+     */
+    public function createAssignment($classId)
+    {
+        $schoolClass = SchoolClass::findOrFail($classId);
+        $teacher = Teacher::where('user_id', Auth::id())->firstOrFail();
+        
+        $currentAssignments = Assignment::where('class_id', $classId)
+            ->active()
+            ->orderBy('due_date', 'asc')
+            ->get();
+
+        return view('teacher.create-assignment', compact('schoolClass', 'currentAssignments', 'teacher'));
+    }
+
+    /**
+     * SALVAR NOVO TRABALHO
+     */
+    public function storeAssignment(Request $request, $classId)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string|max:1000',
+            'due_date' => 'required|date|after_or_equal:today',
+            'due_time' => 'nullable|date_format:H:i',
+            'max_points' => 'required|numeric|min:0|max:1000',
+        ]);
+
+        try {
+            $user = Auth::user();
+            $teacher = Teacher::where('user_id', $user->id)->firstOrFail();
+            $schoolClass = SchoolClass::findOrFail($classId);
+
+            // Verificar se o professor tem acesso à turma
+            $isTeacherInClass = $schoolClass->teachers->contains('id', $teacher->id);
+            if (!$isTeacherInClass) {
+                throw new \Exception('Você não tem acesso a esta turma.');
+            }
+
+            Assignment::create([
+                'class_id' => $classId,
+                'subject_id' => $teacher->subject_id,
+                'teacher_id' => $teacher->id,
+                'title' => $validated['title'],
+                'description' => $validated['description'],
+                'due_date' => $validated['due_date'],
+                'due_time' => $validated['due_time'],
+                'max_points' => $validated['max_points'],
+            ]);
+
+            return redirect()
+                ->route('teacher.class.assignments', $classId)
+                ->with('success', 'Trabalho criado com sucesso!');
+
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'Erro ao criar trabalho: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * MOSTRAR ENTREGAS DE UM TRABALHO
+     */
+    public function showSubmissions($classId, $assignmentId)
+    {
+        $schoolClass = SchoolClass::findOrFail($classId);
+        $assignment = Assignment::with(['submissions.student', 'schoolClass.students'])
+            ->where('class_id', $classId)
+            ->findOrFail($assignmentId);
+
+        // Estatísticas
+        $totalStudents = $assignment->schoolClass->students->count();
+        $submittedCount = $assignment->submissions->count();
+        $gradedCount = $assignment->submissions->where('points', '!=', null)->count();
+
+        return view('teacher.assignment-submissions', compact(
+            'schoolClass', 
+            'assignment',
+            'totalStudents',
+            'submittedCount',
+            'gradedCount'
+        ));
+    }
+
+    /**
+     * AVALIAR ENTREGA
+     */
+    public function gradeSubmission(Request $request, $classId, $assignmentId, $submissionId)
+    {
+        $validated = $request->validate([
+            'points' => 'required|numeric|min:0|max:1000',
+            'feedback' => 'nullable|string|max:500',
+        ]);
+
+        try {
+            $submission = AssignmentSubmission::where('assignment_id', $assignmentId)
+                ->findOrFail($submissionId);
+
+            $submission->update([
+                'points' => $validated['points'],
+                'feedback' => $validated['feedback'],
+            ]);
+
+            return redirect()
+                ->route('teacher.class.assignment.submissions', ['classId' => $classId, 'assignmentId' => $assignmentId])
+                ->with('success', 'Trabalho avaliado com sucesso!');
+
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'Erro ao avaliar trabalho: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * DOWNLOAD DE ARQUIVO ENTREGUE
+     */
+    public function downloadSubmission($classId, $assignmentId, $submissionId)
+    {
+        $submission = AssignmentSubmission::where('assignment_id', $assignmentId)
+            ->findOrFail($submissionId);
+
+        if (!$submission->file_path || !FacadesStorage::exists($submission->file_path)) {
+            abort(404, 'Arquivo não encontrado.');
+        }
+
+        return FacadesStorage::download($submission->file_path);
     }
 }

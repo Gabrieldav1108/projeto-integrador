@@ -95,7 +95,133 @@
                     @endif
                 </div>
             </div>
-        </div>        
+        </div>
+
+        <!-- Trabalhos Disponíveis -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-success text-white py-3">
+                        <h4 class="mb-0">
+                            <i class="fas fa-tasks me-2"></i>
+                            Trabalhos Disponíveis para Entrega
+                        </h4>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="p-3">
+                            @php
+                                // Buscar trabalhos ativos das turmas do aluno nesta matéria
+                                $user = Auth::user();
+                                $classIds = $user->schoolClasses->pluck('id');
+                                
+                                $assignments = \App\Models\Assignment::whereIn('class_id', $classIds)
+                                    ->where('subject_id', $subject->id)
+                                    ->with(['schoolClass', 'teacher.user'])
+                                    ->active()
+                                    ->orderBy('due_date', 'asc')
+                                    ->get()
+                                    ->map(function($assignment) use ($user) {
+                                        $assignment->student_submission = $assignment->getStudentSubmission($user->id);
+                                        // CORREÇÃO: Usar $assignment->is_expired (atributo) em vez de isExpired() (método)
+                                        $assignment->can_submit = !$assignment->is_expired && !$assignment->hasStudentSubmission($user->id);
+                                        return $assignment;
+                                    });
+                            @endphp
+
+                            @if($assignments->count() > 0)
+                                <div class="row g-3">
+                                    @foreach($assignments as $assignment)
+                                        <div class="col-12 col-md-6 col-lg-4">
+                                            <div class="card h-100 border-0 shadow-sm">
+                                                <div class="card-header bg-light py-3">
+                                                    <h6 class="fw-bold mb-0 text-truncate">{{ $assignment->title }}</h6>
+                                                    <small class="text-muted">Turma: {{ $assignment->schoolClass->name }}</small>
+                                                </div>
+                                                <div class="card-body">
+                                                    <p class="card-text small text-muted mb-3">
+                                                        {{ Str::limit($assignment->description, 100) }}
+                                                    </p>
+                                                    
+                                                    <div class="mb-3">
+                                                        <span class="badge bg-primary px-3 py-2 mb-2 d-inline-block">
+                                                            <i class="fas fa-calendar me-1"></i>
+                                                            {{ $assignment->due_date->format('d/m/Y') }}
+                                                            @if($assignment->due_time)
+                                                                às {{ $assignment->due_time }}
+                                                            @endif
+                                                        </span>
+                                                        <span class="badge bg-info px-3 py-2 mb-2 d-inline-block">
+                                                            <i class="fas fa-star me-1"></i>
+                                                            {{ $assignment->max_points }} pts
+                                                        </span>
+                                                    </div>
+
+                                                    <!-- Status da entrega -->
+                                                    @if($assignment->student_submission)
+                                                        <div class="alert alert-success py-2 mb-3">
+                                                            <i class="fas fa-check-circle me-2"></i>
+                                                            <strong>Entregue em:</strong> 
+                                                            {{ \Carbon\Carbon::parse($assignment->student_submission->submitted_at)->format('d/m/Y H:i') }}
+                                                        </div>
+                                                    @elseif($assignment->is_expired) {{-- CORREÇÃO: usar is_expired em vez de isExpired() --}}
+                                                        <div class="alert alert-danger py-2 mb-3">
+                                                            <i class="fas fa-clock me-2"></i>
+                                                            <strong>Prazo expirado</strong>
+                                                        </div>
+                                                    @else
+                                                        <div class="alert alert-warning py-2 mb-3">
+                                                            <i class="fas fa-exclamation-circle me-2"></i>
+                                                            <strong>Aguardando entrega</strong>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                <div class="card-footer bg-white border-0 pt-0">
+                                                    <div class="d-grid gap-2">
+                                                        @if($assignment->can_submit)
+                                                            <a href="{{ route('student.assignment.submit', $assignment->id) }}" 
+                                                               class="btn btn-success btn-sm">
+                                                                <i class="fas fa-paper-plane me-1"></i>
+                                                                Entregar Trabalho
+                                                            </a>
+                                                        @endif
+                                                        
+                                                        <a href="{{ route('student.assignment.show', $assignment->id) }}" 
+                                                           class="btn btn-outline-primary btn-sm">
+                                                            <i class="fas fa-eye me-1"></i>
+                                                            Ver Detalhes
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="text-center py-5 text-muted">
+                                    <i class="fas fa-clipboard-list fa-3x mb-3"></i>
+                                    <p class="mb-2">Nenhum trabalho disponível no momento</p>
+                                    <p class="small">Novos trabalhos aparecerão aqui quando forem criados pelo professor.</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light">
+                        @php
+                            // CORREÇÃO: usar is_expired em vez de isExpired
+                            $pendingAssignments = $assignments->where('can_submit', true)->count();
+                            $submittedAssignments = $assignments->where('student_submission', '!=', null)->count();
+                            $expiredAssignments = $assignments->where('is_expired', true)->where('student_submission', null)->count();
+                        @endphp
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Resumo: {{ $pendingAssignments }} pendentes • 
+                            {{ $submittedAssignments }} entregues • 
+                            {{ $expiredAssignments }} expirados
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Informações adicionais -->
         <div class="row mt-4">
@@ -104,17 +230,21 @@
                     <div class="card-body">
                         <h5 class="card-title">📊 Resumo</h5>
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <strong>🏫 Suas Turmas:</strong> 
                                 {{ $userClasses->count() }}
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <strong>👨‍🏫 Professor:</strong> 
                                 {{ $mainTeacher ? $mainTeacher->name : 'Não atribuído' }}
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <strong>📢 Avisos:</strong> 
                                 {{ $classInformations->count() }}
+                            </div>
+                            <div class="col-md-3">
+                                <strong>📝 Trabalhos:</strong> 
+                                {{ $assignments->count() }}
                             </div>
                         </div>
                     </div>
@@ -122,4 +252,24 @@
             </div>
         </div>
     </section>
+
+    <style>
+        .card {
+            border-radius: 1rem;
+        }
+        .card-header {
+            border-radius: 1rem 1rem 0 0 !important;
+        }
+        .badge {
+            font-size: 0.75em;
+            border-radius: 0.5rem;
+        }
+        .btn-sm {
+            border-radius: 0.5rem;
+        }
+        .alert {
+            border-radius: 0.5rem;
+            margin-bottom: 0;
+        }
+    </style>
 </x-app-layout>
