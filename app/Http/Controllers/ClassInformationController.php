@@ -9,12 +9,12 @@ use App\Models\SchoolClass;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\Subject;
-use Illuminate\Container\Attributes\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage as FacadesStorage;
+use Illuminate\Support\Facades\FacadesFacadesStorage as FacadesFacadesStorage;
+use Illuminate\Support\Facades\Storage;
 
 class ClassInformationController extends Controller
 {
@@ -288,17 +288,28 @@ class ClassInformationController extends Controller
     }
 
     /**
-     * DOWNLOAD DE ARQUIVO ENTREGUE
+     * DOWNLOAD DA ENTREGA DO ALUNO
      */
     public function downloadSubmission($classId, $assignmentId, $submissionId)
     {
-        $submission = AssignmentSubmission::where('assignment_id', $assignmentId)
+        $submission = AssignmentSubmission::with(['assignment', 'student'])
             ->findOrFail($submissionId);
 
-        if (!$submission->file_path || !FacadesStorage::exists($submission->file_path)) {
+        // Verificar se a submissão pertence ao assignment e class corretos
+        if ($submission->assignment_id != $assignmentId || $submission->assignment->class_id != $classId) {
+            abort(404, 'Entrega não encontrada.');
+        }
+
+        // Verificar se o arquivo existe
+        if (!$submission->file_path || !Storage::disk('public')->exists($submission->file_path)) {
             abort(404, 'Arquivo não encontrado.');
         }
 
-        return FacadesStorage::download($submission->file_path);
+        // Método mais direto
+        return Storage::disk('public')->download(
+            $submission->file_path,
+            'entrega_' . $submission->student->name . '_' . $submission->assignment->title . '.' . pathinfo($submission->file_path, PATHINFO_EXTENSION),
+            ['Content-Type' => 'application/octet-stream']
+        );
     }
 }

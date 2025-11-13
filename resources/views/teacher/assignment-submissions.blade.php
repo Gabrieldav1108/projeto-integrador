@@ -16,52 +16,51 @@
                 </div>
 
                 <!-- Informações do Trabalho -->
-            <div class="card shadow-sm mb-5">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">
-                        <i class="fas fa-info-circle me-2 text-primary"></i>
-                        Informações do Trabalho
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <p class="mb-3"><strong>Descrição:</strong> {{ $assignment->description }}</p>
-                            <div class="d-flex flex-wrap gap-4">
-                                <span class="badge bg-primary fs-6 px-3 py-2">
-                                    <i class="fas fa-calendar me-1"></i>
-                                    Entrega: {{ $assignment->due_date->format('d/m/Y') }}
-                                    @if($assignment->due_time)
-                                        às {{ $assignment->due_time }}
+                <div class="card shadow-sm mb-5">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">
+                            <i class="fas fa-info-circle me-2 text-primary"></i>
+                            Informações do Trabalho
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <p class="mb-3"><strong>Descrição:</strong> {{ $assignment->description }}</p>
+                                <div class="d-flex flex-wrap gap-4">
+                                    <span class="badge bg-primary fs-6 px-3 py-2">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        Entrega: {{ $assignment->due_date->format('d/m/Y') }}
+                                        @if($assignment->due_time)
+                                            às {{ $assignment->due_time }}
+                                        @endif
+                                    </span>
+                                    <span class="badge bg-info fs-6 px-3 py-2">
+                                        <i class="fas fa-star me-1"></i>
+                                        {{ $assignment->max_points }} pontos
+                                    </span>
+                                    @if($assignment->is_expired)
+                                        <span class="badge bg-danger fs-6 px-3 py-2">
+                                            <i class="fas fa-clock me-1"></i>Expirado
+                                        </span>
+                                    @else
+                                        <span class="badge bg-success fs-6 px-3 py-2">
+                                            <i class="fas fa-check me-1"></i>Ativo
+                                        </span>
                                     @endif
-                                </span>
-                                <span class="badge bg-info fs-6 px-3 py-2">
-                                    <i class="fas fa-star me-1"></i>
-                                    {{ $assignment->max_points }} pontos
-                                </span>
-                                <!-- 🔥 CORREÇÃO: Usar is_expired em vez de isExpired() -->
-                                @if($assignment->is_expired)
-                                    <span class="badge bg-danger fs-6 px-3 py-2">
-                                        <i class="fas fa-clock me-1"></i>Expirado
-                                    </span>
-                                @else
-                                    <span class="badge bg-success fs-6 px-3 py-2">
-                                        <i class="fas fa-check me-1"></i>Ativo
-                                    </span>
-                                @endif
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-4 text-md-end">
-                            <div class="mt-3 mt-md-0">
-                                <a href="{{ route('teacher.class.informations', $schoolClass->id) }}" 
-                                class="btn btn-outline-secondary me-2">
-                                    <i class="fas fa-arrow-left me-1"></i>Voltar
-                                </a>
+                            <div class="col-md-4 text-md-end">
+                                <div class="mt-3 mt-md-0">
+                                    <a href="{{ route('teacher.class.informations', $schoolClass->id) }}" 
+                                    class="btn btn-outline-secondary me-2">
+                                        <i class="fas fa-arrow-left me-1"></i>Voltar
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
                 <!-- Lista de Entregas -->
                 <div class="card shadow-sm">
@@ -155,12 +154,15 @@
                                                             {{ $submission->is_graded ? 'Ver' : 'Avaliar' }}
                                                         </button>
                                                         
-                                                        <!-- Botão Download -->
                                                         @if($submission->file_path)
-                                                            <a href="{{ route('assignment.submission.download', ['classId' => $schoolClass->id, 'assignmentId' => $assignment->id, 'submissionId' => $submission->id]) }}" 
+                                                            <a href="{{ route('assignment.submission.download', [
+                                                                'classId' => $schoolClass->id, 
+                                                                'assignmentId' => $assignment->id, 
+                                                                'submissionId' => $submission->id
+                                                            ]) }}" 
                                                                class="btn btn-outline-success btn-sm"
                                                                title="Download do arquivo">
-                                                                <i class="fas fa-download"></i>
+                                                                <i class="fas fa-download">Baixar</i>
                                                             </a>
                                                         @else
                                                             <button class="btn btn-outline-secondary btn-sm" disabled
@@ -230,6 +232,27 @@
                                                                               rows="4"
                                                                               placeholder="Digite seu feedback para o aluno...">{{ $submission->feedback ?? '' }}</textarea>
                                                                 </div>
+
+                                                                <!-- Informações do arquivo -->
+                                                                @if($submission->file_path)
+                                                                <div class="mb-3">
+                                                                    <label class="form-label fw-bold">Arquivo Entregue</label>
+                                                                    <div class="d-flex align-items-center">
+                                                                        <a href="{{ route('assignment.submission.download', [
+                                                                            'classId' => $schoolClass->id, 
+                                                                            'assignmentId' => $assignment->id, 
+                                                                            'submissionId' => $submission->id
+                                                                        ]) }}" 
+                                                                           class="btn btn-outline-primary btn-sm me-2">
+                                                                            <i class="fas fa-download me-1"></i>
+                                                                            Baixar Arquivo
+                                                                        </a>
+                                                                        <small class="text-muted">
+                                                                            {{ basename($submission->file_path) }}
+                                                                        </small>
+                                                                    </div>
+                                                                </div>
+                                                                @endif
                                                             </div>
                                                             <div class="modal-footer">
                                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
