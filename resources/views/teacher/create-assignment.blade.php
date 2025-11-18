@@ -100,7 +100,7 @@
                                                         {{ $assignment->max_points }} pts
                                                     </small>
                                                 </div>
-                                                @if($assignment->isExpired())
+                                                @if($assignment->is_expired)
                                                     <span class="badge bg-danger mt-1">Expirado</span>
                                                 @else
                                                     <span class="badge bg-success mt-1">Ativo</span>

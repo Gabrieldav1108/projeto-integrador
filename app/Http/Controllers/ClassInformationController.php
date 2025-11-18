@@ -174,15 +174,30 @@ class ClassInformationController extends Controller
 
     public function showAssignments($classId)
     {
+        $user = Auth::user();
+        $teacher = Teacher::where('user_id', $user->id)->first();
+        
+        if (!$teacher) {
+            abort(403, 'Acesso negado. Usuário não é um professor.');
+        }
+
         $schoolClass = SchoolClass::with(['students'])->findOrFail($classId);
         
+        // Verificar se o professor tem acesso a esta turma
+        $isTeacherInClass = $schoolClass->teachers->contains('id', $teacher->id);
+        if (!$isTeacherInClass) {
+            abort(403, 'Você não tem acesso a esta turma.');
+        }
+        
+        // Buscar trabalhos APENAS da matéria do professor atual
         $assignments = Assignment::where('class_id', $classId)
+            ->where('subject_id', $teacher->subject_id) // ← FILTRAR PELA MATÉRIA DO PROFESSOR
             ->with(['submissions.student', 'teacher.user'])
             ->active()
             ->latest()
             ->get();
 
-        return view('teacher.assignment-submissions', compact('schoolClass', 'assignments'));
+        return view('teacher.assignment-submissions', compact('schoolClass', 'assignments', 'teacher'));
     }
 
     /**
@@ -190,15 +205,26 @@ class ClassInformationController extends Controller
      */
     public function createAssignment($classId)
     {
+        $user = Auth::user();
+        $teacher = Teacher::where('user_id', $user->id)->firstOrFail();
         $schoolClass = SchoolClass::findOrFail($classId);
-        $teacher = Teacher::where('user_id', Auth::id())->firstOrFail();
-        
+
+        // Buscar trabalhos APENAS da matéria do professor atual
         $currentAssignments = Assignment::where('class_id', $classId)
+            ->where('subject_id', $teacher->subject_id) // ← FILTRAR PELA MATÉRIA DO PROFESSOR
             ->active()
             ->orderBy('due_date', 'asc')
             ->get();
 
-        return view('teacher.create-assignment', compact('schoolClass', 'currentAssignments', 'teacher'));
+        // Buscar matérias da turma (para o select, se necessário)
+        $subjects = $schoolClass->subjects;
+
+        return view('teacher.create-assignment', compact(
+            'schoolClass', 
+            'currentAssignments', 
+            'teacher', 
+            'subjects'
+        ));
     }
 
     /**
@@ -236,6 +262,8 @@ class ClassInformationController extends Controller
                 'max_points' => $validated['max_points'],
             ]);
 
+            logger('Trabalho criado com sucesso! Matéria: ' . $teacher->subject_id);
+
             return redirect()
                 ->route('teacher.class.assignments', $classId)
                 ->with('success', 'Trabalho criado com sucesso!');
@@ -252,9 +280,19 @@ class ClassInformationController extends Controller
      */
     public function showSubmissions($classId, $assignmentId)
     {
+        $user = Auth::user();
+        $teacher = Teacher::where('user_id', $user->id)->first();
+        
+        if (!$teacher) {
+            abort(403, 'Acesso negado. Usuário não é um professor.');
+        }
+
         $schoolClass = SchoolClass::findOrFail($classId);
+        
+        // Buscar trabalho APENAS se for da matéria do professor
         $assignment = Assignment::with(['submissions.student', 'schoolClass.students'])
             ->where('class_id', $classId)
+            ->where('subject_id', $teacher->subject_id) // ← FILTRAR PELA MATÉRIA DO PROFESSOR
             ->findOrFail($assignmentId);
 
         // Estatísticas
@@ -267,7 +305,8 @@ class ClassInformationController extends Controller
             'assignment',
             'totalStudents',
             'submittedCount',
-            'gradedCount'
+            'gradedCount',
+            'teacher'
         ));
     }
 

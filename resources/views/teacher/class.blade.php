@@ -143,14 +143,13 @@
             </div>
 
             <!-- Trabalhos Entregáveis -->
-            
             <div class="col-12 col-md-4 d-flex flex-column">
                 <div class="card shadow-sm border-0 h-100">
                     <div class="card-header bg-success text-white py-3">
                         <div class="d-flex justify-content-between align-items-center">
                             <h4 class="mb-0">
                                 <i class="fas fa-tasks me-2"></i>
-                                Trabalhos
+                                Trabalhos - {{ $teacher->subject->name ?? 'Minha Matéria' }}
                             </h4>
                             <a href="{{ route('assignment.create', $schoolClass->id) }}" 
                             class="btn btn-light btn-sm">
@@ -161,8 +160,12 @@
                     <div class="card-body p-0">
                         <div class="p-3" style="max-height: 450px; overflow-y: auto;">
                             @php
-                                // Buscar trabalhos ativos desta turma
+                                // Buscar trabalhos ativos desta turma APENAS da matéria do professor
+                                $user = Auth::user();
+                                $teacher = \App\Models\Teacher::where('user_id', $user->id)->first();
+                                
                                 $assignments = \App\Models\Assignment::where('class_id', $schoolClass->id)
+                                    ->where('subject_id', $teacher->subject_id) // ← FILTRAR PELA MATÉRIA DO PROFESSOR
                                     ->active()
                                     ->withCount('submissions')
                                     ->orderBy('due_date', 'asc')
@@ -196,7 +199,11 @@
                                                             {{ $assignment->submissions_count }} entregas
                                                         </span>
                                                     </div>
-                                                    <!-- 🔥 CORREÇÃO DEFINITIVA: Usar $assignment->is_expired -->
+                                                    <!-- Mostrar a matéria do trabalho -->
+                                                    <small class="text-muted d-block mb-2">
+                                                        <i class="fas fa-book me-1"></i>
+                                                        {{ $assignment->subject->name ?? 'Matéria' }}
+                                                    </small>
                                                     @if($assignment->is_expired)
                                                         <span class="badge bg-danger px-3 py-2">
                                                             <i class="fas fa-clock me-1"></i>Expirado
@@ -215,7 +222,7 @@
                                                 </a>
                                                 <button class="btn btn-outline-secondary btn-sm" 
                                                         data-bs-toggle="tooltip" 
-                                                        title="Total de alunos: {{ $schoolClass->students->count() }} | Entregas: {{ $assignment->submissions_count }}">
+                                                        title="Total de alunos: {{ $schoolClass->students->count() }} | Entregas: {{ $assignment->submissions_count }} | Matéria: {{ $assignment->subject->name ?? 'Matéria' }}">
                                                     <i class="fas fa-chart-bar"></i>
                                                 </button>
                                             </div>
@@ -225,7 +232,7 @@
                             @else
                                 <div class="text-center py-5 text-muted">
                                     <i class="fas fa-clipboard-list fa-3x mb-3"></i>
-                                    <p class="mb-2">Nenhum trabalho criado</p>
+                                    <p class="mb-2">Nenhum trabalho criado para {{ $teacher->subject->name ?? 'sua matéria' }}</p>
                                     <a href="{{ route('assignment.create', $schoolClass->id) }}" 
                                     class="btn btn-success btn-sm">
                                         Criar Primeiro Trabalho
@@ -241,12 +248,11 @@
                         @endphp
                         <small class="text-muted">
                             <i class="fas fa-info-circle me-1"></i>
-                            {{ $activeAssignments }} trabalhos ativos • {{ $totalSubmissions }} entregas
+                            {{ $activeAssignments }} trabalhos de {{ $teacher->subject->name ?? 'sua matéria' }} • {{ $totalSubmissions }} entregas
                         </small>
                     </div>
                 </div>
             </div>
-        </div>
 
         <!-- Botão Voltar -->
         <div class="text-center mt-4">
