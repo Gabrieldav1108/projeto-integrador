@@ -20,15 +20,29 @@ class ClassInformationController extends Controller
 {
     public function index($classId)
     {
+        $user = Auth::user();
+        $teacher = Teacher::where('user_id', $user->id)->first();
+        
+        if (!$teacher) {
+            abort(403, 'Acesso negado. Usuário não é um professor.');
+        }
+
         $schoolClass = SchoolClass::with(['students'])->findOrFail($classId);
         
+        // Verificar se o professor tem acesso a esta turma
+        $isTeacherInClass = $schoolClass->teachers->contains('id', $teacher->id);
+        if (!$isTeacherInClass) {
+            abort(403, 'Você não tem acesso a esta turma.');
+        }
+        
+        // Buscar avisos APENAS da matéria do professor atual
         $informations = ClassInformation::where('class_id', $classId)
+            ->where('subject_id', $teacher->subject_id) // ← FILTRAR PELA MATÉRIA DO PROFESSOR
             ->active() 
             ->latest()
             ->get();
         
-        // Agora usamos $schoolClass->students diretamente (que são users)
-        return view('teacher.class', compact('schoolClass', 'informations'));
+        return view('teacher.class', compact('schoolClass', 'informations', 'teacher'));
     }
 
     public function create($classId)

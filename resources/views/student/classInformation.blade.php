@@ -60,6 +60,7 @@
                 </div>
 
                 <div class="border rounded p-3 bg-light h-100">
+
                     @if($classInformations->count() > 0)
                         <ul class="list-group">
                             @foreach($classInformations as $info)
@@ -90,12 +91,11 @@
                     @else
                         <div class="text-center py-4 text-muted">
                             <i class="fas fa-bell-slash fa-2x mb-3"></i>
-                            <p>Nenhum aviso disponível para suas turmas.</p>
+                            <p>Nenhum aviso disponível para esta matéria.</p>
                         </div>
                     @endif
                 </div>
             </div>
-        </div>
 
         <!-- Trabalhos Disponíveis -->
         <div class="row mt-4">

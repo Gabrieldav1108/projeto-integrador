@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Assignment;
 use App\Models\ClassInformation;
 use App\Models\Grade;
 use App\Models\Student;
 use App\Models\User;
 use App\Models\SchoolClass;
 use App\Models\Subject;
+use App\Models\Teacher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -29,18 +31,12 @@ class StudentController extends Controller
 
     public function showSubject($subjectId)
     {
-        // Buscar a matéria com os relacionamentos corretos
-        $subject = Subject::with([
-            'schoolClasses.students',
-            'schoolClasses.teachers.user',
-            'classInformations' => function($query) {
-                $query->active()->latest();
-            },
-            'teachers.user'
-        ])->findOrFail($subjectId);
-
-        // Verificar se o estudante está matriculado nesta matéria
         $user = Auth::user();
+        
+        // Buscar a matéria
+        $subject = Subject::findOrFail($subjectId);
+        
+        // Verificar se o aluno está matriculado na matéria
         $isStudentInSubject = $subject->schoolClasses()
             ->whereHas('students', function($query) use ($user) {
                 $query->where('users.id', $user->id);
@@ -50,28 +46,46 @@ class StudentController extends Controller
             abort(403, 'Você não está matriculado nesta matéria.');
         }
 
-        // Buscar APENAS as turmas do aluno nesta matéria
-        $userClasses = $subject->schoolClasses()
-            ->whereHas('students', function($query) use ($user) {
-                $query->where('users.id', $user->id);
-            })->get();
+        // Buscar turmas do aluno
+        $userClasses = $user->schoolClasses;
 
-        //Buscar avisos APENAS das turmas do aluno
-        $classIds = $userClasses->pluck('id');
+        // Buscar avisos APENAS desta matéria e das turmas do aluno
+        $classIds = $user->schoolClasses->pluck('id');
         $classInformations = ClassInformation::whereIn('class_id', $classIds)
-            ->where('subject_id', $subjectId)
+            ->where('subject_id', $subjectId) // ← FILTRAR POR MATÉRIA
             ->active()
-            ->latest()
+            ->orderBy('created_at', 'desc')
             ->get();
 
-        // Buscar professor desta matéria
-        $mainTeacher = $subject->teachers->first();
+        // Buscar professor principal (buscar professores que lecionam esta matéria nas turmas do aluno)
+        $mainTeacher = Teacher::whereHas('schoolClasses', function($query) use ($classIds) {
+                $query->whereIn('classes.id', $classIds);
+            })
+            ->whereHas('subject', function($query) use ($subjectId) {
+                $query->where('subjects.id', $subjectId);
+            })
+            ->with('user')
+            ->first();
+
+        // Buscar trabalhos
+        $assignments = Assignment::whereIn('class_id', $classIds)
+            ->where('subject_id', $subjectId)
+            ->with(['schoolClass', 'teacher.user'])
+            ->active()
+            ->orderBy('due_date', 'asc')
+            ->get()
+            ->map(function($assignment) use ($user) {
+                $assignment->student_submission = $assignment->getStudentSubmission($user->id);
+                $assignment->can_submit = !$assignment->is_expired && !$assignment->hasStudentSubmission($user->id);
+                return $assignment;
+            });
 
         return view('student.classInformation', compact(
-            'subject', 
-            'mainTeacher', 
+            'subject',
             'userClasses',
-            'classInformations' // 🔥 Enviar avisos filtrados
+            'classInformations',
+            'mainTeacher',
+            'assignments'
         ));
     }
 
