@@ -15,7 +15,7 @@
             <div class="col-12 col-lg-5 d-flex flex-column mb-4 mb-lg-0">
                 <div class="bg-white rounded shadow-sm p-3 h-100">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="text-center mb-0"><strong>Notas</strong></h5>
+                        <h5 class="text-center mb-0"><strong>Notas - {{ $subject->name }}</stronWg></h5>
                     </div>
                     <p class="text-center text-muted small mb-3">Clique em qualquer nota para editar</p>
 
@@ -38,24 +38,49 @@
                                     $firstCount = 0;
                                     $secondCount = 0;
                                     $thirdCount = 0;
+                                    
+                                    // Filtrar apenas as notas da matéria atual
+                                    $subjectGrades = [
+                                        'first_trimester' => [],
+                                        'second_trimester' => [],
+                                        'third_trimester' => []
+                                    ];
+                                    
+                                    if (isset($grades['first_trimester'])) {
+                                        $subjectGrades['first_trimester'] = array_filter($grades['first_trimester'], function($grade) use ($subject) {
+                                            return isset($grade['subject_id']) && $grade['subject_id'] == $subject->id;
+                                        });
+                                    }
+                                    
+                                    if (isset($grades['second_trimester'])) {
+                                        $subjectGrades['second_trimester'] = array_filter($grades['second_trimester'], function($grade) use ($subject) {
+                                            return isset($grade['subject_id']) && $grade['subject_id'] == $subject->id;
+                                        });
+                                    }
+                                    
+                                    if (isset($grades['third_trimester'])) {
+                                        $subjectGrades['third_trimester'] = array_filter($grades['third_trimester'], function($grade) use ($subject) {
+                                            return isset($grade['subject_id']) && $grade['subject_id'] == $subject->id;
+                                        });
+                                    }
                                 @endphp
 
                                 <!-- Primeiro Trimestre -->
-                                @if(isset($grades['first_trimester']) && count($grades['first_trimester']) > 0)
+                                @if(count($subjectGrades['first_trimester']) > 0)
                                 <tr>
                                     <th scope="row">1° Trim</th>
-                                    @foreach($grades['first_trimester'] as $index => $grade)
+                                    @foreach($subjectGrades['first_trimester'] as $index => $grade)
                                         <td>
                                             @if(isset($grade['id']))
                                                 <a href="{{ route('teacher.grades.edit', ['studentId' => $student->id, 'gradeId' => $grade['id']]) }}" 
-                                                   class="btn btn-outline-primary btn-sm w-100 py-1"
-                                                   title="Clique para editar esta nota">
+                                                class="btn btn-outline-primary btn-sm w-100 py-1"
+                                                title="Clique para editar esta nota">
                                                     {{ number_format($grade['grade'], 1) }}
                                                 </a>
                                             @else
-                                                <a href="{{ route('teacher.grades.create', $student->id) }}" 
-                                                   class="btn btn-outline-secondary btn-sm w-100 py-1"
-                                                   title="Adicionar nota">
+                                                <a href="{{ route('teacher.grades.create', $student->id) }}?subject_id={{ $subject->id }}" 
+                                                class="btn btn-outline-secondary btn-sm w-100 py-1"
+                                                title="Adicionar nota">
                                                     <i class="fas fa-plus"></i>
                                                 </a>
                                             @endif
@@ -68,9 +93,9 @@
                                     {{-- Preencher notas faltantes --}}
                                     @for($i = $firstCount; $i < 3; $i++)
                                         <td>
-                                            <a href="{{ route('teacher.grades.create', $student->id) }}" 
-                                               class="btn btn-outline-secondary btn-sm w-100 py-1"
-                                               title="Adicionar nota">
+                                            <a href="{{ route('teacher.grades.create', $student->id) }}?subject_id={{ $subject->id }}" 
+                                            class="btn btn-outline-secondary btn-sm w-100 py-1"
+                                            title="Adicionar nota">
                                                 <i class="fas fa-plus"></i>
                                             </a>
                                         </td>
@@ -89,9 +114,9 @@
                                     <th scope="row">1° Trim</th>
                                     @for($i = 0; $i < 3; $i++)
                                         <td>
-                                            <a href="{{ route('teacher.grades.create', $student->id) }}" 
-                                               class="btn btn-outline-secondary btn-sm w-100 py-1"
-                                               title="Adicionar nota">
+                                            <a href="{{ route('teacher.grades.create', $student->id) }}?subject_id={{ $subject->id }}" 
+                                            class="btn btn-outline-secondary btn-sm w-100 py-1"
+                                            title="Adicionar nota">
                                                 <i class="fas fa-plus"></i>
                                             </a>
                                         </td>
@@ -103,21 +128,21 @@
                                 @endif
 
                                 <!-- Segundo Trimestre -->
-                                @if(isset($grades['second_trimester']) && count($grades['second_trimester']) > 0)
+                                @if(count($subjectGrades['second_trimester']) > 0)
                                 <tr>
                                     <th scope="row">2° Trim</th>
-                                    @foreach($grades['second_trimester'] as $index => $grade)
+                                    @foreach($subjectGrades['second_trimester'] as $index => $grade)
                                         <td>
                                             @if(isset($grade['id']))
                                                 <a href="{{ route('teacher.grades.edit', ['studentId' => $student->id, 'gradeId' => $grade['id']]) }}" 
-                                                   class="btn btn-outline-primary btn-sm w-100 py-1"
-                                                   title="Clique para editar esta nota">
+                                                class="btn btn-outline-primary btn-sm w-100 py-1"
+                                                title="Clique para editar esta nota">
                                                     {{ number_format($grade['grade'], 1) }}
                                                 </a>
                                             @else
-                                                <a href="{{ route('teacher.grades.create', $student->id) }}" 
-                                                   class="btn btn-outline-secondary btn-sm w-100 py-1"
-                                                   title="Adicionar nota">
+                                                <a href="{{ route('teacher.grades.create', $student->id) }}?subject_id={{ $subject->id }}" 
+                                                class="btn btn-outline-secondary btn-sm w-100 py-1"
+                                                title="Adicionar nota">
                                                     <i class="fas fa-plus"></i>
                                                 </a>
                                             @endif
@@ -130,9 +155,9 @@
                                     {{-- Preencher notas faltantes --}}
                                     @for($i = $secondCount; $i < 3; $i++)
                                         <td>
-                                            <a href="{{ route('teacher.grades.create', $student->id) }}" 
-                                               class="btn btn-outline-secondary btn-sm w-100 py-1"
-                                               title="Adicionar nota">
+                                            <a href="{{ route('teacher.grades.create', $student->id) }}?subject_id={{ $subject->id }}" 
+                                            class="btn btn-outline-secondary btn-sm w-100 py-1"
+                                            title="Adicionar nota">
                                                 <i class="fas fa-plus"></i>
                                             </a>
                                         </td>
@@ -151,9 +176,9 @@
                                     <th scope="row">2° Trim</th>
                                     @for($i = 0; $i < 3; $i++)
                                         <td>
-                                            <a href="{{ route('teacher.grades.create', $student->id) }}" 
-                                               class="btn btn-outline-secondary btn-sm w-100 py-1"
-                                               title="Adicionar nota">
+                                            <a href="{{ route('teacher.grades.create', $student->id) }}?subject_id={{ $subject->id }}" 
+                                            class="btn btn-outline-secondary btn-sm w-100 py-1"
+                                            title="Adicionar nota">
                                                 <i class="fas fa-plus"></i>
                                             </a>
                                         </td>
@@ -165,21 +190,21 @@
                                 @endif
 
                                 <!-- Terceiro Trimestre -->
-                                @if(isset($grades['third_trimester']) && count($grades['third_trimester']) > 0)
+                                @if(count($subjectGrades['third_trimester']) > 0)
                                 <tr>
                                     <th scope="row">3° Trim</th>
-                                    @foreach($grades['third_trimester'] as $index => $grade)
+                                    @foreach($subjectGrades['third_trimester'] as $index => $grade)
                                         <td>
                                             @if(isset($grade['id']))
                                                 <a href="{{ route('teacher.grades.edit', ['studentId' => $student->id, 'gradeId' => $grade['id']]) }}" 
-                                                   class="btn btn-outline-primary btn-sm w-100 py-1"
-                                                   title="Clique para editar esta nota">
+                                                class="btn btn-outline-primary btn-sm w-100 py-1"
+                                                title="Clique para editar esta nota">
                                                     {{ number_format($grade['grade'], 1) }}
                                                 </a>
                                             @else
-                                                <a href="{{ route('teacher.grades.create', $student->id) }}" 
-                                                   class="btn btn-outline-secondary btn-sm w-100 py-1"
-                                                   title="Adicionar nota">
+                                                <a href="{{ route('teacher.grades.create', $student->id) }}?subject_id={{ $subject->id }}" 
+                                                class="btn btn-outline-secondary btn-sm w-100 py-1"
+                                                title="Adicionar nota">
                                                     <i class="fas fa-plus"></i>
                                                 </a>
                                             @endif
@@ -192,9 +217,9 @@
                                     {{-- Preencher notas faltantes --}}
                                     @for($i = $thirdCount; $i < 3; $i++)
                                         <td>
-                                            <a href="{{ route('teacher.grades.create', $student->id) }}" 
-                                               class="btn btn-outline-secondary btn-sm w-100 py-1"
-                                               title="Adicionar nota">
+                                            <a href="{{ route('teacher.grades.create', $student->id) }}?subject_id={{ $subject->id }}" 
+                                            class="btn btn-outline-secondary btn-sm w-100 py-1"
+                                            title="Adicionar nota">
                                                 <i class="fas fa-plus"></i>
                                             </a>
                                         </td>
@@ -213,9 +238,9 @@
                                     <th scope="row">3° Trim</th>
                                     @for($i = 0; $i < 3; $i++)
                                         <td>
-                                            <a href="{{ route('teacher.grades.create', $student->id) }}" 
-                                               class="btn btn-outline-secondary btn-sm w-100 py-1"
-                                               title="Adicionar nota">
+                                            <a href="{{ route('teacher.grades.create', $student->id) }}?subject_id={{ $subject->id }}" 
+                                            class="btn btn-outline-secondary btn-sm w-100 py-1"
+                                            title="Adicionar nota">
                                                 <i class="fas fa-plus"></i>
                                             </a>
                                         </td>
@@ -262,8 +287,8 @@
                     </div>
                 </div>
             </div>
+            </div>
 
-            <!-- Coluna: Informações do aluno (mantida igual) -->
             <div class="col-12 col-lg-5 d-flex flex-column">
                 <div class="bg-white rounded shadow-sm p-3 h-100">
                     <h5 class="text-center mb-4"><strong>Informações do aluno</strong></h5>
