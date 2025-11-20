@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Admin\ClassSubjectController;
+use App\Http\Controllers\AssignmentController;
+use App\Http\Controllers\AssignmentSubmissionController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ClassController;
 use App\Http\Controllers\ClassInformationController;
@@ -101,20 +103,39 @@ Route::prefix('teacher')->middleware(['auth', 'role:teacher'])->group(function()
             ->name('teacher.class.information.destroy');
 
 
-        //trabalhos
-        Route::get('/assignments', [ClassInformationController::class, 'showAssignments'])
-        ->name('assignments');
-        Route::get('/assignment/create', [ClassInformationController::class, 'createAssignment'])
-        ->name('assignment.create');
-        Route::post('/assignment/store', [ClassInformationController::class, 'storeAssignment'])
-        ->name('assignment.store');
-        Route::get('/assignment/{assignmentId}/submissions', [ClassInformationController::class, 'showSubmissions'])
-        ->name('assignment.submissions');
-        Route::post('/assignment/{assignmentId}/submission/{submissionId}/grade', [ClassInformationController::class, 'gradeSubmission'])
-        ->name('assignment.submission.grade');
-        Route::get('/assignment/{assignmentId}/submission/{submissionId}/download', [ClassInformationController::class, 'downloadSubmission'])
-        ->name('assignment.submission.download');
-    });
+
+        //trabalhos - LISTA DE TRABALHOS
+        Route::get('/assignments', [AssignmentController::class, 'show'])
+            ->name('assignments');
+
+        // CRIAR TRABALHO
+        Route::get('/assignment/create', [AssignmentController::class, 'create'])
+            ->name('assignment.create');
+        Route::post('/assignment', [AssignmentController::class, 'store'])
+            ->name('assignment.store');
+
+        // EDITAR / ATUALIZAR TRABALHO
+        Route::get('/assignment/{assignment}/edit', [AssignmentController::class, 'edit'])
+            ->name('assignment.edit');
+        Route::put('/assignment/{assignment}', [AssignmentController::class, 'update'])
+            ->name('assignment.update');
+
+        Route::delete('/assignment/{assignment}', [AssignmentController::class, 'destroy'])
+            ->name('assignment.destroy');
+
+        // ROTAS DE SUBMISSÕES (usando AssignmentSubmissionController)
+        Route::get('/assignment/{assignment}/submissions', [AssignmentSubmissionController::class, 'showSubmissions'])
+            ->name('assignment.submissions');
+
+        Route::post('/assignment/{assignment}/submission/{submission}/grade', [AssignmentSubmissionController::class, 'gradeSubmission'])
+            ->name('assignment.submission.grade');
+
+        Route::get('/assignment/{assignment}/submission/{submission}/download', [AssignmentSubmissionController::class, 'downloadSubmission'])
+            ->name('assignment.submission.download');
+
+        Route::delete('/assignment/{assignment}/submission/{submission}', [AssignmentSubmissionController::class, 'destroy'])
+            ->name('assignment.submission.destroy');
+        });
 
     // Estudantes - AGORA USANDO O CONTROLLER DO PROFESSOR
     Route::prefix('students')->group(function() {

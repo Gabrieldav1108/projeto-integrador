@@ -216,15 +216,89 @@
                                                 </div>
                                             </div>
                                             <div class="d-flex gap-2">
-                                                <a href="{{ route('assignment.submissions', ['classId' => $schoolClass->id, 'assignmentId' => $assignment->id]) }}" 
-                                                class="btn btn-outline-primary btn-sm flex-fill">
-                                                    <i class="fas fa-eye me-1"></i>Ver Entregas
+                                                <a class="dropdown-item" 
+                                                href="{{ route('assignment.submissions', ['classId' => $schoolClass->id, 'assignment' => $assignment->id]) }}">
+                                                    <i class="fas fa-eye me-2"></i>Ver Entregas
                                                 </a>
+                                                
+                                                {{-- Botão editar --}}
+                                                <a href="{{ route('assignment.edit', [$schoolClass->id, $assignment->id]) }}"
+                                                    class="btn btn-warning btn-sm flex-fill">
+                                                    <i class="fas fa-edit me-1"></i>Editar
+                                                </a>
+
+                                                {{-- Botão excluir --}}
+                                                <button type="button" 
+                                                        class="btn btn-danger btn-sm" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#deleteAssignmentModal{{ $assignment->id }}">
+                                                    <i class="fas fa-trash me-1"></i>Excluir
+                                                </button>
+                                                
                                                 <button class="btn btn-outline-secondary btn-sm" 
                                                         data-bs-toggle="tooltip" 
                                                         title="Total de alunos: {{ $schoolClass->students->count() }} | Entregas: {{ $assignment->submissions_count }} | Matéria: {{ $assignment->subject->name ?? 'Matéria' }}">
                                                     <i class="fas fa-chart-bar"></i>
                                                 </button>
+                                            </div>
+
+                                            <!-- Modal de Confirmação de Exclusão -->
+                                            <div class="modal fade" id="deleteAssignmentModal{{ $assignment->id }}" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title text-danger">
+                                                                <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Exclusão
+                                                            </h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="alert alert-danger">
+                                                                <h6 class="alert-heading">⚠️ ATENÇÃO: Esta operação é irreversível!</h6>
+                                                            </div>
+                                                            
+                                                            <p><strong>Trabalho:</strong> {{ $assignment->title }}</p>
+                                                            <p><strong>Turma:</strong> {{ $schoolClass->name }}</p>
+                                                            
+                                                            @if($assignment->submissions_count > 0)
+                                                                <div class="alert alert-warning">
+                                                                    <h6 class="alert-heading">
+                                                                        <i class="fas fa-database me-1"></i>
+                                                                        Este trabalho possui <strong>{{ $assignment->submissions_count }} entrega(s)</strong> que serão permanentemente excluídas!
+                                                                    </h6>
+                                                                    <p class="mb-0 small">
+                                                                        Todas as entregas dos alunos serão perdidas e não poderão ser recuperadas.
+                                                                    </p>
+                                                                </div>
+                                                            @else
+                                                                <div class="alert alert-info">
+                                                                    <i class="fas fa-info-circle me-1"></i>
+                                                                    Este trabalho não possui entregas realizadas.
+                                                                </div>
+                                                            @endif
+                                                            
+                                                            <p class="text-muted small mb-0">
+                                                                <i class="fas fa-clock me-1"></i>
+                                                                Criado em: {{ $assignment->created_at->format('d/m/Y H:i') }}
+                                                            </p>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                                <i class="fas fa-times me-1"></i>Cancelar
+                                                            </button>
+                                                            <form action="{{ route('assignment.destroy', ['classId' => $schoolClass->id, 'assignment' => $assignment->id]) }}" 
+                                                                method="POST" 
+                                                                class="d-inline">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="btn btn-danger">
+                                                                    <i class="fas fa-trash me-1"></i>
+                                                                    Sim, Excluir Permanentemente
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     @endforeach

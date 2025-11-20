@@ -114,7 +114,7 @@
                                                 <ul class="dropdown-menu">
                                                     <li>
                                                         <a class="dropdown-item" 
-                                                           href="{{ route('assignment.submissions', ['classId' => $schoolClass->id, 'assignmentId' => $assignment->id]) }}">
+                                                        href="{{ route('assignment.submissions', ['classId' => $schoolClass->id, 'assignment' => $assignment->id]) }}">
                                                             <i class="fas fa-eye me-2"></i>Ver Entregas
                                                         </a>
                                                     </li>
