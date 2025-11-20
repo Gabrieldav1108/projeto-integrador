@@ -154,15 +154,23 @@
                                                             {{ $submission->is_graded ? 'Ver' : 'Avaliar' }}
                                                         </button>
                                                         
+                                                        <!-- NOVO BOTÃO: Ir para tela de notas do aluno -->
+                                                        <a href="{{ route('teacher.students.show', $submission->student->id) }}?assignment_id={{ $assignment->id }}"
+                                                        class="btn btn-outline-info btn-sm"
+                                                        title="Ver perfil completo do aluno e adicionar notas"
+                                                        data-bs-toggle="tooltip">
+                                                            <i class="fas fa-star me-1"></i>Notas
+                                                        </a>
+                                                        
                                                         @if($submission->file_path)
                                                             <a href="{{ route('assignment.submission.download', [
                                                                 'classId' => $schoolClass->id, 
-                                                                'assignmentId' => $assignment->id, 
-                                                                'submissionId' => $submission->id
+                                                                'assignment' => $assignment->id, 
+                                                                'submission' => $submission->id
                                                             ]) }}" 
-                                                               class="btn btn-outline-success btn-sm"
-                                                               title="Download do arquivo">
-                                                                <i class="fas fa-download">Baixar</i>
+                                                            class="btn btn-outline-success btn-sm"
+                                                            title="Download do arquivo">
+                                                                <i class="fas fa-download">Download</i>
                                                             </a>
                                                         @else
                                                             <button class="btn btn-outline-secondary btn-sm" disabled
@@ -184,7 +192,11 @@
                                                             </h5>
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                         </div>
-                                                        <form action="{{ route('assignment.submission.grade', ['classId' => $schoolClass->id, 'assignmentId' => $assignment->id, 'submissionId' => $submission->id]) }}" 
+                                                        <form action="{{ route('assignment.submission.grade', [
+                                                                        'classId' => $schoolClass->id, 
+                                                                        'assignment' => $assignment->id, 
+                                                                        'submission' => $submission->id
+                                                                        ]) }}" 
                                                               method="POST">
                                                             @csrf
                                                             <div class="modal-body">
@@ -240,8 +252,8 @@
                                                                     <div class="d-flex align-items-center">
                                                                         <a href="{{ route('assignment.submission.download', [
                                                                             'classId' => $schoolClass->id, 
-                                                                            'assignmentId' => $assignment->id, 
-                                                                            'submissionId' => $submission->id
+                                                                            'assignment' => $assignment->id, 
+                                                                            'submission' => $submission->id
                                                                         ]) }}" 
                                                                            class="btn btn-outline-primary btn-sm me-2">
                                                                             <i class="fas fa-download me-1"></i>

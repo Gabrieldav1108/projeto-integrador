@@ -127,6 +127,9 @@ Route::prefix('teacher')->middleware(['auth', 'role:teacher'])->group(function()
         Route::get('/assignment/{assignment}/submissions', [AssignmentSubmissionController::class, 'showSubmissions'])
             ->name('assignment.submissions');
 
+        Route::post('/grades/student/{studentId}/assignment', [AssignmentSubmissionController::class, 'updateAssignmentGrade'])
+            ->name('teacher.grades.update-assignment');
+
         Route::post('/assignment/{assignment}/submission/{submission}/grade', [AssignmentSubmissionController::class, 'gradeSubmission'])
             ->name('assignment.submission.grade');
 

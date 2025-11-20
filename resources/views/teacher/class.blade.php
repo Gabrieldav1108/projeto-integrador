@@ -27,11 +27,22 @@
                                     @foreach($schoolClass->students as $userStudent)
                                         <div class="list-group-item d-flex justify-content-between align-items-center py-3">
                                             <div class="d-flex align-items-center">
-                                                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" 
-                                                     style="width: 40px; height: 40px;">
-                                                    <i class="fas fa-user text-white"></i>
+                                                <div class="me-3">
+                                                    @if($userStudent->foto)
+                                                        <!-- Se o aluno tem foto, mostra a imagem -->
+                                                        <img src="{{ asset('images/profiles/' . $userStudent->foto) }}" 
+                                                            alt="Foto de {{ $userStudent->name }}"
+                                                            class="rounded-circle"
+                                                            style="width: 50px; height: 50px; object-fit: cover;">
+                                                    @else
+                                                        <!-- Se não tem foto, mostra o ícone padrão -->
+                                                        <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center" 
+                                                            style="width: 50px; height: 50px;">
+                                                            <i class="fas fa-user text-white"></i>
+                                                        </div>
+                                                    @endif
                                                 </div>
-                                                <div>
+                                                <div class="flex-grow-1">
                                                     <strong class="d-block">{{ $userStudent->name }}</strong>
                                                     <small class="text-muted">{{ $userStudent->email }}</small>
                                                 </div>
@@ -218,7 +229,7 @@
                                             <div class="d-flex gap-2">
                                                 <a class="dropdown-item" 
                                                 href="{{ route('assignment.submissions', ['classId' => $schoolClass->id, 'assignment' => $assignment->id]) }}">
-                                                    <i class="fas fa-eye me-2"></i>Ver Entregas
+                                                    <i class="btn btn-outline-primary btn-sm">Ver entregas</i>
                                                 </a>
                                                 
                                                 {{-- Botão editar --}}

@@ -2,7 +2,8 @@
     @slot('title', 'Informações do aluno - ' . $student->name)
     <x-teacher-header/>
 
-    <section class="container p-4 mt-5 rounded-4" style="background-color: #cfe2ff">
+    <section class="container p-4 mt-5 rounded-4 mx-auto d-flex flex-column"
+            style="background-color: #cfe2ff; max-width: 1200px; height: auto;">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="text-center text-md-start mb-0">Informações do aluno</h2>
             <a href="javascript:history.back()" class="btn btn-secondary">
@@ -10,24 +11,26 @@
             </a>
         </div>
 
-        <div class="row rounded p-4 g-4 justify-content-center">
+        <!-- Container principal com display flex -->
+        <div class="d-flex flex-column flex-lg-row gap-4">
             <!-- Coluna: Notas -->
-            <div class="col-12 col-lg-5 d-flex flex-column mb-4 mb-lg-0">
-                <div class="bg-white rounded shadow-sm p-3 h-100">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="text-center mb-0"><strong>Notas - {{ $subject->name }}</stronWg></h5>
+            <div class="p-4 rounded-4"
+                style="background:white; max-height:500px; overflow:auto;">
+                <div class="bg-white rounded shadow-sm p-4 h-100">
+                    <div class="mb-3">
+                        <h5 class="text-center mb-2"><strong>Notas - {{ $subject->name }}</strong></h5>
+                        <p class="text-center text-muted small mb-0">Clique em qualquer nota para editar</p>
                     </div>
-                    <p class="text-center text-muted small mb-3">Clique em qualquer nota para editar</p>
 
-                    <div class="table-responsive mt-2">
+                    <div class="table-responsive">
                         <table class="table table-bordered table-hover mb-0">
                             <thead class="table-primary">
                                 <tr>
-                                    <th scope="col">Avaliação</th>
-                                    <th scope="col">1º nota</th>
-                                    <th scope="col">2º nota</th>
-                                    <th scope="col">3º nota</th>
-                                    <th scope="col">Média Trim</th>
+                                    <th scope="col" class="text-center">Avaliação</th>
+                                    <th scope="col" class="text-center">1º nota</th>
+                                    <th scope="col" class="text-center">2º nota</th>
+                                    <th scope="col" class="text-center">3º nota</th>
+                                    <th scope="col" class="text-center">Média Trim</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -39,7 +42,6 @@
                                     $secondCount = 0;
                                     $thirdCount = 0;
                                     
-                                    // Filtrar apenas as notas da matéria atual
                                     $subjectGrades = [
                                         'first_trimester' => [],
                                         'second_trimester' => [],
@@ -68,9 +70,9 @@
                                 <!-- Primeiro Trimestre -->
                                 @if(count($subjectGrades['first_trimester']) > 0)
                                 <tr>
-                                    <th scope="row">1° Trim</th>
+                                    <th scope="row" class="text-center">1° Trim</th>
                                     @foreach($subjectGrades['first_trimester'] as $index => $grade)
-                                        <td>
+                                        <td class="text-center">
                                             @if(isset($grade['id']))
                                                 <a href="{{ route('teacher.grades.edit', ['studentId' => $student->id, 'gradeId' => $grade['id']]) }}" 
                                                 class="btn btn-outline-primary btn-sm w-100 py-1"
@@ -90,9 +92,8 @@
                                             $firstCount++;
                                         @endphp
                                     @endforeach
-                                    {{-- Preencher notas faltantes --}}
                                     @for($i = $firstCount; $i < 3; $i++)
-                                        <td>
+                                        <td class="text-center">
                                             <a href="{{ route('teacher.grades.create', $student->id) }}?subject_id={{ $subject->id }}" 
                                             class="btn btn-outline-secondary btn-sm w-100 py-1"
                                             title="Adicionar nota">
@@ -100,7 +101,7 @@
                                             </a>
                                         </td>
                                     @endfor
-                                    <td class="align-middle">
+                                    <td class="text-center align-middle">
                                         <strong>
                                             @php
                                                 $firstTrimAverage = $firstCount > 0 ? $firstAverage / $firstCount : 0;
@@ -111,9 +112,9 @@
                                 </tr>
                                 @else
                                 <tr>
-                                    <th scope="row">1° Trim</th>
+                                    <th scope="row" class="text-center">1° Trim</th>
                                     @for($i = 0; $i < 3; $i++)
-                                        <td>
+                                        <td class="text-center">
                                             <a href="{{ route('teacher.grades.create', $student->id) }}?subject_id={{ $subject->id }}" 
                                             class="btn btn-outline-secondary btn-sm w-100 py-1"
                                             title="Adicionar nota">
@@ -121,7 +122,7 @@
                                             </a>
                                         </td>
                                     @endfor
-                                    <td class="align-middle">
+                                    <td class="text-center align-middle">
                                         <strong>0.0</strong>
                                     </td>
                                 </tr>
@@ -130,9 +131,9 @@
                                 <!-- Segundo Trimestre -->
                                 @if(count($subjectGrades['second_trimester']) > 0)
                                 <tr>
-                                    <th scope="row">2° Trim</th>
+                                    <th scope="row" class="text-center">2° Trim</th>
                                     @foreach($subjectGrades['second_trimester'] as $index => $grade)
-                                        <td>
+                                        <td class="text-center">
                                             @if(isset($grade['id']))
                                                 <a href="{{ route('teacher.grades.edit', ['studentId' => $student->id, 'gradeId' => $grade['id']]) }}" 
                                                 class="btn btn-outline-primary btn-sm w-100 py-1"
@@ -152,9 +153,8 @@
                                             $secondCount++;
                                         @endphp
                                     @endforeach
-                                    {{-- Preencher notas faltantes --}}
                                     @for($i = $secondCount; $i < 3; $i++)
-                                        <td>
+                                        <td class="text-center">
                                             <a href="{{ route('teacher.grades.create', $student->id) }}?subject_id={{ $subject->id }}" 
                                             class="btn btn-outline-secondary btn-sm w-100 py-1"
                                             title="Adicionar nota">
@@ -162,20 +162,20 @@
                                             </a>
                                         </td>
                                     @endfor
-                                    <td class="align-middle">
+                                    <td class="text-center align-middle">
                                         <strong>
                                             @php
                                                 $secondTrimAverage = $secondCount > 0 ? $secondAverage / $secondCount : 0;
-                                            @endphp
+                                                @endphp
                                             {{ number_format($secondTrimAverage, 1) }}
                                         </strong>
                                     </td>
                                 </tr>
                                 @else
                                 <tr>
-                                    <th scope="row">2° Trim</th>
+                                    <th scope="row" class="text-center">2° Trim</th>
                                     @for($i = 0; $i < 3; $i++)
-                                        <td>
+                                        <td class="text-center">
                                             <a href="{{ route('teacher.grades.create', $student->id) }}?subject_id={{ $subject->id }}" 
                                             class="btn btn-outline-secondary btn-sm w-100 py-1"
                                             title="Adicionar nota">
@@ -183,7 +183,7 @@
                                             </a>
                                         </td>
                                     @endfor
-                                    <td class="align-middle">
+                                    <td class="text-center align-middle">
                                         <strong>0.0</strong>
                                     </td>
                                 </tr>
@@ -192,9 +192,9 @@
                                 <!-- Terceiro Trimestre -->
                                 @if(count($subjectGrades['third_trimester']) > 0)
                                 <tr>
-                                    <th scope="row">3° Trim</th>
+                                    <th scope="row" class="text-center">3° Trim</th>
                                     @foreach($subjectGrades['third_trimester'] as $index => $grade)
-                                        <td>
+                                        <td class="text-center">
                                             @if(isset($grade['id']))
                                                 <a href="{{ route('teacher.grades.edit', ['studentId' => $student->id, 'gradeId' => $grade['id']]) }}" 
                                                 class="btn btn-outline-primary btn-sm w-100 py-1"
@@ -214,9 +214,8 @@
                                             $thirdCount++;
                                         @endphp
                                     @endforeach
-                                    {{-- Preencher notas faltantes --}}
                                     @for($i = $thirdCount; $i < 3; $i++)
-                                        <td>
+                                        <td class="text-center">
                                             <a href="{{ route('teacher.grades.create', $student->id) }}?subject_id={{ $subject->id }}" 
                                             class="btn btn-outline-secondary btn-sm w-100 py-1"
                                             title="Adicionar nota">
@@ -224,20 +223,20 @@
                                             </a>
                                         </td>
                                     @endfor
-                                    <td class="align-middle">
+                                    <td class="text-center align-middle">
                                         <strong>
                                             @php
                                                 $thirdTrimAverage = $thirdCount > 0 ? $thirdAverage / $thirdCount : 0;
-                                            @endphp
+                                                @endphp
                                             {{ number_format($thirdTrimAverage, 1) }}
                                         </strong>
                                     </td>
                                 </tr>
                                 @else
                                 <tr>
-                                    <th scope="row">3° Trim</th>
+                                    <th scope="row" class="text-center">3° Trim</th>
                                     @for($i = 0; $i < 3; $i++)
-                                        <td>
+                                        <td class="text-center">
                                             <a href="{{ route('teacher.grades.create', $student->id) }}?subject_id={{ $subject->id }}" 
                                             class="btn btn-outline-secondary btn-sm w-100 py-1"
                                             title="Adicionar nota">
@@ -245,7 +244,7 @@
                                             </a>
                                         </td>
                                     @endfor
-                                    <td class="align-middle">
+                                    <td class="text-center align-middle">
                                         <strong>0.0</strong>
                                     </td>
                                 </tr>
@@ -256,10 +255,9 @@
                                     <td colspan="4" class="text-end align-middle">
                                         <strong>Média final:</strong>
                                     </td>
-                                    <td class="align-middle">
+                                    <td class="text-center align-middle">
                                         <strong class="fs-5">
                                             @php
-                                                // Calcular a média final baseada nas médias dos trimestres
                                                 $trimestersWithGrades = 0;
                                                 $totalTrimAverage = 0;
                                                 
@@ -287,19 +285,29 @@
                     </div>
                 </div>
             </div>
-            </div>
 
-            <div class="col-12 col-lg-5 d-flex flex-column">
-                <div class="bg-white rounded shadow-sm p-3 h-100">
+            <!-- Coluna: Informações do Aluno -->
+            <div class="flex-fill">
+                <div class="p-4 rounded-4"
+                style="background:white; max-height:500px; overflow:auto;">
                     <h5 class="text-center mb-4"><strong>Informações do aluno</strong></h5>
 
                     <!-- Foto e nome do aluno -->
                     <div class="text-center mb-4">
                         <div class="mb-3">
-                            <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center" 
-                                 style="width: 80px; height: 80px;">
-                                <i class="fas fa-user fa-2x text-white"></i>
-                            </div>
+                            @if($student->foto)
+                                <!-- Se o aluno tem foto, mostra a imagem -->
+                                <img src="{{ asset('images/profiles/' . $student->foto) }}" 
+                                    alt="Foto de {{ $student->name }}"
+                                    class="rounded-circle"
+                                    style="width: 80px; height: 80px; object-fit: cover;">
+                            @else
+                                <!-- Se não tem foto, mostra o ícone padrão -->
+                                <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center" 
+                                    style="width: 80px; height: 80px;">
+                                    <i class="fas fa-user fa-2x text-white"></i>
+                                </div>
+                            @endif
                         </div>
                         <h4 class="text-primary mb-1">{{ $student->name }}</h4>
                         @if($student->schoolClass)
@@ -309,16 +317,16 @@
 
                     <!-- Informações -->
                     <div class="student-info">
-                        <div class="d-flex align-items-center mb-3 p-2 bg-light rounded">
-                            <i class="fas fa-envelope text-primary me-3"></i>
+                        <div class="d-flex align-items-center mb-3 p-3 bg-light rounded">
+                            <i class="fas fa-envelope text-primary me-3 fs-5"></i>
                             <div>
                                 <div class="text-muted small">E-mail</div>
                                 <div class="fw-medium">{{ $student->email }}</div>
                             </div>
                         </div>
                         
-                        <div class="d-flex align-items-center mb-3 p-2 bg-light rounded">
-                            <i class="fas fa-birthday-cake text-primary me-3"></i>
+                        <div class="d-flex align-items-center mb-3 p-3 bg-light rounded">
+                            <i class="fas fa-birthday-cake text-primary me-3 fs-5"></i>
                             <div>
                                 <div class="text-muted small">Idade</div>
                                 <div class="fw-medium">{{ $student->age ?? 'N/A' }} anos</div>
@@ -326,8 +334,8 @@
                         </div>
 
                         @if($student->schoolClass && $student->schoolClass->teachers->count() > 0)
-                        <div class="d-flex align-items-center mb-3 p-2 bg-light rounded">
-                            <i class="fas fa-chalkboard-teacher text-primary me-3"></i>
+                        <div class="d-flex align-items-center mb-3 p-3 bg-light rounded">
+                            <i class="fas fa-chalkboard-teacher text-primary me-3 fs-5"></i>
                             <div>
                                 <div class="text-muted small">Professores da Turma</div>
                                 <div class="fw-medium">
@@ -338,13 +346,13 @@
                         @endif
 
                         @if($student->schoolClass && $student->schoolClass->subjects->count() > 0)
-                        <div class="d-flex align-items-center mb-3 p-2 bg-light rounded">
-                            <i class="fas fa-book text-primary me-3"></i>
+                        <div class="d-flex align-items-center mb-3 p-3 bg-light rounded">
+                            <i class="fas fa-book text-primary me-3 fs-5"></i>
                             <div>
                                 <div class="text-muted small">Matérias da Turma</div>
                                 <div class="fw-medium">
                                     @foreach($student->schoolClass->subjects->take(3) as $subject)
-                                        <span class="badge bg-primary me-1">{{ $subject->name }}</span>
+                                        <span class="badge bg-primary me-1 mb-1">{{ $subject->name }}</span>
                                     @endforeach
                                     @if($student->schoolClass->subjects->count() > 3)
                                         <span class="badge bg-secondary">+{{ $student->schoolClass->subjects->count() - 3 }}</span>
@@ -354,8 +362,8 @@
                         </div>
                         @endif
 
-                        <div class="d-flex align-items-center mb-3 p-2 bg-light rounded">
-                            <i class="fas fa-id-card text-primary me-3"></i>
+                        <div class="d-flex align-items-center mb-3 p-3 bg-light rounded">
+                            <i class="fas fa-id-card text-primary me-3 fs-5"></i>
                             <div>
                                 <div class="text-muted small">ID do Estudante</div>
                                 <div class="fw-medium">#{{ $student->id }}</div>
@@ -381,9 +389,6 @@
         .badge {
             font-size: 0.75em;
             padding: 0.4em 0.6em;
-        }   
-        .container {
-            max-width: 1200px;
         }
         .btn-outline-primary:hover {
             background-color: #0d6efd;
@@ -393,5 +398,23 @@
             background-color: #6c757d;
             color: white;
         }
+
+        .custom-container {
+            background-color: #cfe2ff;
+            max-width: 1300px;   /* controla a largura */
+            margin: 0 auto;      /* centraliza */
+        }
+        /* Garantir layout lado a lado */
+        @media (min-width: 992px) {
+            .row.fix {
+                display: flex !important;
+                flex-wrap: nowrap !important;
+            }
+            .row.fix > .col-lg-6 {
+                width: 50% !important;
+                max-width: 50% !important;
+            }
+        }
+        
     </style>
 </x-app-layout>

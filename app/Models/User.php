@@ -27,7 +27,7 @@ class User extends Authenticatable
 
     protected $appends = [
         'foto_url',
-        'total_students', // 🔥 ADICIONANDO O APPEND QUE ESTAVA FALTANDO
+        'total_students', 
     ];
 
     protected function casts(): array

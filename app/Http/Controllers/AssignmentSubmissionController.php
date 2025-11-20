@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
 use App\Models\SchoolClass;
+use App\Models\Student;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +16,7 @@ class AssignmentSubmissionController extends Controller
     /**
      * MOSTRAR ENTREGAS DE UM TRABALHO
      */
-    public function showSubmissions($classId, Assignment $assignment)
+   public function showSubmissions($classId, $assignment)
     {
         $user = Auth::user();
         $teacher = Teacher::where('user_id', $user->id)->first();
@@ -24,27 +25,25 @@ class AssignmentSubmissionController extends Controller
             abort(403, 'Acesso negado. Usuário não é um professor.');
         }
 
-        // Verificar se o assignment pertence à turma
-        if ($assignment->class_id != $classId) {
-            abort(404, 'Trabalho não encontrado nesta turma.');
-        }
-
         $schoolClass = SchoolClass::findOrFail($classId);
-
+        
         // Buscar trabalho APENAS se for da matéria do professor
+        $assignment = Assignment::with(['submissions.student', 'schoolClass.students'])
+            ->where('class_id', $classId)
+            ->where('subject_id', $teacher->subject_id)
+            ->findOrFail($assignment);
+
+        // Verificar se o trabalho pertence à matéria do professor
         if ($assignment->subject_id != $teacher->subject_id) {
             abort(403, 'Acesso negado. Este trabalho não é da sua matéria.');
         }
-
-        // Carregar relações necessárias
-        $assignment->load(['submissions.student.user', 'schoolClass.students.user']);
 
         // Estatísticas
         $totalStudents = $assignment->schoolClass->students->count();
         $submittedCount = $assignment->submissions->count();
         $gradedCount = $assignment->submissions->where('points', '!=', null)->count();
 
-        return view('teacher.assignment-submissions', compact(
+        return view('teacher.assignments.submissions.index', compact(
             'schoolClass', 
             'assignment',
             'totalStudents',
@@ -52,6 +51,48 @@ class AssignmentSubmissionController extends Controller
             'gradedCount',
             'teacher'
         ));
+    }
+    public function updateAssignmentGrade(Request $request, $studentId)
+    {
+        $validated = $request->validate([
+            'assignment_id' => 'required|exists:assignments,id',
+            'points' => 'required|numeric|min:0',
+            'feedback' => 'nullable|string|max:500',
+        ]);
+
+        try {
+            $user = Auth::user();
+            $teacher = \App\Models\Teacher::where('user_id', $user->id)->firstOrFail();
+            $student = Student::findOrFail($studentId);
+
+            // Buscar a submissão do aluno
+            $submission = AssignmentSubmission::where('assignment_id', $validated['assignment_id'])
+                ->where('student_id', $studentId)
+                ->firstOrFail();
+
+            // Verificar se o assignment pertence ao professor
+            $assignment = $submission->assignment;
+            if ($assignment->teacher_id != $teacher->id) {
+                abort(403, 'Você não tem permissão para avaliar este trabalho.');
+            }
+
+            // Atualizar a submissão
+            $submission->update([
+                'points' => $validated['points'],
+                'feedback' => $validated['feedback'],
+                'is_graded' => true,
+                'grade_percentage' => ($validated['points'] / $assignment->max_points) * 100,
+            ]);
+
+            return redirect()
+                ->route('teacher.students.show', $studentId)
+                ->with('success', 'Nota do trabalho atualizada com sucesso!');
+
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'Erro ao atualizar nota: ' . $e->getMessage());
+        }
     }
 
     /**
