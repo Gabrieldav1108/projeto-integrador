@@ -287,47 +287,31 @@
             </div>
 
             <!-- Coluna: Informações do Aluno -->
+            
             <div class="flex-fill">
-                <div class="p-4 rounded-4"
-                style="background:white; max-height:500px; overflow:auto;">
+                <div class="p-4 rounded-4 bg-white" style="max-height: 500px; overflow: auto;">
                     <h5 class="text-center mb-4"><strong>Informações do aluno</strong></h5>
 
                     <!-- Foto e nome do aluno -->
                     <div class="text-center mb-4">
-                        <div class="mb-3">
-                            @if($student->foto)
-                                <!-- Se o aluno tem foto, mostra a imagem -->
-                                <img src="{{ asset('images/profiles/' . $student->foto) }}" 
-                                    alt="Foto de {{ $student->name }}"
-                                    class="rounded-circle"
-                                    style="width: 80px; height: 80px; object-fit: cover;">
-                            @else
-                                <!-- Se não tem foto, mostra o ícone padrão -->
-                                <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center" 
-                                    style="width: 80px; height: 80px;">
-                                    <i class="fas fa-user fa-2x text-white"></i>
-                                </div>
-                            @endif
-                        </div>
-                        <h4 class="text-primary mb-1">{{ $student->name }}</h4>
+                        <x-student-avatar :student="$student" size="lg" vertical />
+                        <h4 class="text-primary mt-3 mb-2">{{ $student->name }}</h4>
                         @if($student->schoolClass)
-                            <span class="badge bg-secondary">{{ $student->schoolClass->name }}</span>
+                            <span class="badge bg-secondary fs-6">{{ $student->schoolClass->name }}</span>
                         @endif
                     </div>
 
                     <!-- Informações -->
                     <div class="student-info">
                         <div class="d-flex align-items-center mb-3 p-3 bg-light rounded">
-                            <i class="fas fa-envelope text-primary me-3 fs-5"></i>
-                            <div>
+                            <div class="flex-grow-1">
                                 <div class="text-muted small">E-mail</div>
-                                <div class="fw-medium">{{ $student->email }}</div>
+                                <div class="fw-medium text-break">{{ $student->email }}</div>
                             </div>
                         </div>
                         
                         <div class="d-flex align-items-center mb-3 p-3 bg-light rounded">
-                            <i class="fas fa-birthday-cake text-primary me-3 fs-5"></i>
-                            <div>
+                            <div class="flex-grow-1">
                                 <div class="text-muted small">Idade</div>
                                 <div class="fw-medium">{{ $student->age ?? 'N/A' }} anos</div>
                             </div>
@@ -335,8 +319,7 @@
 
                         @if($student->schoolClass && $student->schoolClass->teachers->count() > 0)
                         <div class="d-flex align-items-center mb-3 p-3 bg-light rounded">
-                            <i class="fas fa-chalkboard-teacher text-primary me-3 fs-5"></i>
-                            <div>
+                            <div class="flex-grow-1">
                                 <div class="text-muted small">Professores da Turma</div>
                                 <div class="fw-medium">
                                     {{ $student->schoolClass->teachers->pluck('name')->implode(', ') }}
@@ -346,25 +329,20 @@
                         @endif
 
                         @if($student->schoolClass && $student->schoolClass->subjects->count() > 0)
-                        <div class="d-flex align-items-center mb-3 p-3 bg-light rounded">
-                            <i class="fas fa-book text-primary me-3 fs-5"></i>
-                            <div>
-                                <div class="text-muted small">Matérias da Turma</div>
+                        <div class="d-flex align-items-start mb-3 p-3 bg-light rounded">
+                            <div class="flex-grow-1">
+                                <div class="text-muted small mb-2">Matérias da Turma</div>
                                 <div class="fw-medium">
-                                    @foreach($student->schoolClass->subjects->take(3) as $subject)
-                                        <span class="badge bg-primary me-1 mb-1">{{ $subject->name }}</span>
+                                    @foreach($student->schoolClass->subjects as $subject)
+                                        <span class="badge bg-primary me-1 mb-1 d-inline-block">{{ $subject->name }}</span>
                                     @endforeach
-                                    @if($student->schoolClass->subjects->count() > 3)
-                                        <span class="badge bg-secondary">+{{ $student->schoolClass->subjects->count() - 3 }}</span>
-                                    @endif
                                 </div>
                             </div>
                         </div>
                         @endif
 
                         <div class="d-flex align-items-center mb-3 p-3 bg-light rounded">
-                            <i class="fas fa-id-card text-primary me-3 fs-5"></i>
-                            <div>
+                            <div class="flex-grow-1">
                                 <div class="text-muted small">ID do Estudante</div>
                                 <div class="fw-medium">#{{ $student->id }}</div>
                             </div>

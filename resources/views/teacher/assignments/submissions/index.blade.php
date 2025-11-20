@@ -88,16 +88,7 @@
                                         @foreach($assignment->submissions as $submission)
                                             <tr>
                                                 <td class="ps-4">
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" 
-                                                             style="width: 40px; height: 40px;">
-                                                            <i class="fas fa-user text-white"></i>
-                                                        </div>
-                                                        <div>
-                                                            <strong class="d-block">{{ $submission->student->name }}</strong>
-                                                            <small class="text-muted">{{ $submission->student->email }}</small>
-                                                        </div>
-                                                    </div>
+                                                    <x-student-avatar :student="$submission->student" size="sm" />
                                                 </td>
                                                 <td>
                                                     <small class="text-muted">
