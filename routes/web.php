@@ -4,11 +4,13 @@ use App\Http\Controllers\Admin\ClassSubjectController;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\AssignmentSubmissionController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\ClassContentController;
 use App\Http\Controllers\ClassController;
 use App\Http\Controllers\ClassInformationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentAssignmentController;
+use App\Http\Controllers\StudentContentController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\Teacher\GradeController;
 use App\Http\Controllers\TeacherController;
@@ -85,6 +87,14 @@ Route::prefix('teacher')->middleware(['auth', 'role:teacher'])->group(function()
     // Turmas do Professor
     Route::prefix('classes')->group(function() {
         Route::get('{classId}', [ClassController::class, 'show'])->name('teacher.classes.show');
+    });
+
+    Route::prefix('content')->group(function () {
+        Route::get('{content}/view', [ClassContentController::class, 'view'])->name('teacher.content.view');             
+        Route::post('/', [ClassContentController::class, 'store'])->name('teacher.content.store');
+        Route::put('/{content}', [ClassContentController::class, 'update'])->name('teacher.content.update');
+        Route::delete('/{content}', [ClassContentController::class, 'destroy'])->name('teacher.content.destroy');
+        Route::get('/{content}/download', [ClassContentController::class, 'download'])->name('teacher.content.download');
     });
 
     // Informações de Turma
@@ -172,9 +182,15 @@ Route::prefix('teacher')->middleware(['auth', 'role:teacher'])->group(function()
 Route::prefix('student')->middleware(['auth', 'role:student'])->group(function() {
     Route::get('home', [HomeController::class, 'indexStudent'])->name('student.home');
     Route::get('dashboard', [HomeController::class, 'indexStudent'])->name('student.dashboard'); 
+
+    Route::get('content/{content}/view', [StudentContentController::class, 'view'])
+    ->name('student.content.view');
+    Route::get('/contents/{content}/download', [StudentContentController::class, 'download'])
+    ->name('student.contents.download');
     
     Route::get('/assignments', [StudentAssignmentController::class, 'index'])
     ->name('student.assignments');
+
     
     // Trabalhos por matéria
     Route::get('/assignments/subject/{subjectId}', [StudentAssignmentController::class, 'showSubjectAssignments'])

@@ -60,7 +60,6 @@
                 </div>
 
                 <div class="border rounded p-3 bg-light h-100">
-
                     @if($classInformations->count() > 0)
                         <ul class="list-group">
                             @foreach($classInformations as $info)
@@ -96,136 +95,231 @@
                     @endif
                 </div>
             </div>
+        </div>
 
-        <!-- Trabalhos Disponíveis -->
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-success text-white py-3">
-                <h4 class="mb-0">
-                    <i class="fas fa-tasks me-2"></i>
-                    Trabalhos Disponíveis para Entrega
-                </h4>
-            </div>
-            <div class="card-body p-0">
-                <div class="p-3">
-                    @php
-                        // Buscar trabalhos ativos das turmas do aluno nesta matéria
-                        $user = Auth::user();
-                        $classIds = $user->schoolClasses->pluck('id');
-                        
-                        
-                        $assignments = \App\Models\Assignment::whereIn('class_id', $classIds)
-                            ->where('subject_id', $subject->id)
-                            ->with(['schoolClass', 'teacher.user'])
-                            ->active()
-                            ->orderBy('due_date', 'asc')
-                            ->get();
+        <!-- Conteúdos da Matéria -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-warning text-dark py-3">
+                        <h4 class="mb-0">
+                            <i class="fas fa-book me-2"></i>
+                            Conteúdos da Matéria
+                        </h4>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="p-3">
+                            @php
+                                // Buscar conteúdos das turmas do aluno nesta matéria
+                                $user = Auth::user();
+                                $classIds = $user->schoolClasses->pluck('id');
+                                
+                                $contents = \App\Models\ClassContent::whereIn('class_id', $classIds)
+                                    ->where('subject_id', $subject->id)
+                                    ->with(['subject', 'schoolClass'])
+                                    ->orderBy('created_at', 'desc')
+                                    ->get();
+                            @endphp
 
-                        foreach ($assignments as $assignment) {
-                            logger(' - ' . $assignment->title . ' (Turma: ' . $assignment->class_id . ', Matéria: ' . $assignment->subject_id . ')');
-                        }
-
-                        $assignments = $assignments->map(function($assignment) use ($user) {
-                            $assignment->student_submission = $assignment->getStudentSubmission($user->id);
-                            $assignment->can_submit = !$assignment->is_expired && !$assignment->hasStudentSubmission($user->id);
-                            return $assignment;
-                        });
-                    @endphp
-
-                    @if($assignments->count() > 0)
-                        <div class="row g-3">
-                            @foreach($assignments as $assignment)
-                                <div class="col-12 col-md-6 col-lg-4">
-                                    <div class="card h-100 border-0 shadow-sm">
-                                        <div class="card-header bg-light py-3">
-                                            <h6 class="fw-bold mb-0 text-truncate">{{ $assignment->title }}</h6>
-                                            <small class="text-muted">Turma: {{ $assignment->schoolClass->name }}</small>
-                                        </div>
-                                        <div class="card-body">
-                                            <p class="card-text small text-muted mb-3">
-                                                {{ Str::limit($assignment->description, 100) }}
-                                            </p>
-                                            
-                                            <div class="mb-3">
-                                                <span class="badge bg-primary px-3 py-2 mb-2 d-inline-block">
-                                                    <i class="fas fa-calendar me-1"></i>
-                                                    {{ $assignment->due_date->format('d/m/Y') }}
-                                                    @if($assignment->due_time)
-                                                        às {{ $assignment->due_time }}
+                            @if($contents->count() > 0)
+                                <div class="row g-3">
+                                    @foreach($contents as $content)
+                                        <div class="col-12 col-md-6 col-lg-4">
+                                            <div class="card h-100 border-0 shadow-sm">
+                                                <div class="card-header bg-light py-3">
+                                                    <div class="d-flex align-items-center">
+                                                        @switch($content->type)
+                                                            @case('pdf')
+                                                                <i class="fas fa-file-pdf text-danger me-2"></i>
+                                                                @break
+                                                            @case('text')
+                                                                <i class="fas fa-file-alt text-primary me-2"></i>
+                                                                @break
+                                                            @case('video')
+                                                                <i class="fas fa-video text-success me-2"></i>
+                                                                @break
+                                                            @case('link')
+                                                                <i class="fas fa-link text-info me-2"></i>
+                                                                @break
+                                                        @endswitch
+                                                        <h6 class="fw-bold mb-0 text-truncate">{{ $content->title }}</h6>
+                                                    </div>
+                                                    <small class="text-muted">Turma: {{ $content->schoolClass->name }}</small>
+                                                </div>
+                                                <div class="card-body">
+                                                    @if($content->description)
+                                                        <p class="card-text small text-muted mb-3">
+                                                            {{ Str::limit($content->description, 100) }}
+                                                        </p>
                                                     @endif
-                                                </span>
-                                                <span class="badge bg-info px-3 py-2 mb-2 d-inline-block">
-                                                    <i class="fas fa-star me-1"></i>
-                                                    {{ $assignment->max_points }} pts
-                                                </span>
-                                            </div>
-
-                                            <!-- Status da entrega -->
-                                            @if($assignment->student_submission)
-                                                <div class="alert alert-success py-2 mb-3">
-                                                    <i class="fas fa-check-circle me-2"></i>
-                                                    <strong>Entregue em:</strong> 
-                                                    {{ \Carbon\Carbon::parse($assignment->student_submission->submitted_at)->format('d/m/Y H:i') }}
+                                                    
+                                                    <div class="mb-3">
+                                                        <span class="badge bg-secondary px-2 py-1 mb-1 d-inline-block">
+                                                            <i class="fas fa-tag me-1"></i>
+                                                            {{ ucfirst($content->type) }}
+                                                        </span>
+                                                        <span class="badge bg-light text-dark px-2 py-1 mb-1 d-inline-block">
+                                                            <i class="fas fa-calendar me-1"></i>
+                                                            {{ $content->created_at->format('d/m/Y') }}
+                                                        </span>
+                                                    </div>
                                                 </div>
-                                            @elseif($assignment->is_expired)
-                                                <div class="alert alert-danger py-2 mb-3">
-                                                    <i class="fas fa-clock me-2"></i>
-                                                    <strong>Prazo expirado</strong>
+                                                <div class="card-footer bg-white border-0 pt-0">
+                                                    <div class="d-grid gap-2">
+                                                        <a href="{{ route('student.content.view', $content->id) }}" 
+                                                           class="btn btn-outline-primary btn-sm">
+                                                            <i class="fas fa-eye me-1"></i>
+                                                            Ver Conteúdo
+                                                        </a>
+                                                    </div>
                                                 </div>
-                                            @else
-                                                <div class="alert alert-warning py-2 mb-3">
-                                                    <i class="fas fa-exclamation-circle me-2"></i>
-                                                    <strong>Aguardando entrega</strong>
-                                                </div>
-                                            @endif
-                                        </div>
-                                        <div class="card-footer bg-white border-0 pt-0">
-                                            <div class="d-grid gap-2">
-                                                @if($assignment->can_submit)
-                                                    <a href="{{ route('student.assignment.submit', $assignment->id) }}" 
-                                                       class="btn btn-success btn-sm">
-                                                        <i class="fas fa-paper-plane me-1"></i>
-                                                        Entregar Trabalho
-                                                    </a>
-                                                @endif
-                                                
-                                                <a href="{{ route('student.assignment.show', $assignment->id) }}" 
-                                                   class="btn btn-outline-primary btn-sm">
-                                                    <i class="fas fa-eye me-1"></i>
-                                                    Ver Detalhes
-                                                </a>
                                             </div>
                                         </div>
-                                    </div>
+                                    @endforeach
                                 </div>
-                            @endforeach
+                            @else
+                                <div class="text-center py-5 text-muted">
+                                    <i class="fas fa-book-open fa-3x mb-3"></i>
+                                    <p class="mb-2">Nenhum conteúdo disponível</p>
+                                    <p class="small">O professor ainda não adicionou conteúdos para esta matéria.</p>
+                                </div>
+                            @endif
                         </div>
-                    @else
-                        <div class="text-center py-5 text-muted">
-                            <i class="fas fa-clipboard-list fa-3x mb-3"></i>
-                            <p class="mb-2">Nenhum trabalho disponível no momento</p>
-                            <p class="small">Novos trabalhos aparecerão aqui quando forem criados pelo professor.</p>
-                        </div>
-                    @endif
+                    </div>
+                    <div class="card-footer bg-light">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            {{ $contents->count() }} conteúdos disponíveis
+                        </small>
+                    </div>
                 </div>
             </div>
-            <div class="card-footer bg-light">
-                @php
-                    $pendingAssignments = $assignments->where('can_submit', true)->count();
-                    $submittedAssignments = $assignments->where('student_submission', '!=', null)->count();
-                    $expiredAssignments = $assignments->where('is_expired', true)->where('student_submission', null)->count();
-                @endphp
-                <small class="text-muted">
-                    <i class="fas fa-info-circle me-1"></i>
-                    Resumo: {{ $pendingAssignments }} pendentes • 
-                    {{ $submittedAssignments }} entregues • 
-                    {{ $expiredAssignments }} expirados
-                </small>
+        </div>
+
+        <!-- Trabalhos Disponíveis -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-success text-white py-3">
+                        <h4 class="mb-0">
+                            <i class="fas fa-tasks me-2"></i>
+                            Trabalhos Disponíveis para Entrega
+                        </h4>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="p-3">
+                            @php
+                                // Buscar trabalhos ativos das turmas do aluno nesta matéria
+                                $user = Auth::user();
+                                $classIds = $user->schoolClasses->pluck('id');
+                                
+                                $assignments = \App\Models\Assignment::whereIn('class_id', $classIds)
+                                    ->where('subject_id', $subject->id)
+                                    ->with(['schoolClass', 'teacher.user'])
+                                    ->active()
+                                    ->orderBy('due_date', 'asc')
+                                    ->get();
+
+                                $assignments = $assignments->map(function($assignment) use ($user) {
+                                    $assignment->student_submission = $assignment->getStudentSubmission($user->id);
+                                    $assignment->can_submit = !$assignment->is_expired && !$assignment->hasStudentSubmission($user->id);
+                                    return $assignment;
+                                });
+                            @endphp
+
+                            @if($assignments->count() > 0)
+                                <div class="row g-3">
+                                    @foreach($assignments as $assignment)
+                                        <div class="col-12 col-md-6 col-lg-4">
+                                            <div class="card h-100 border-0 shadow-sm">
+                                                <div class="card-header bg-light py-3">
+                                                    <h6 class="fw-bold mb-0 text-truncate">{{ $assignment->title }}</h6>
+                                                    <small class="text-muted">Turma: {{ $assignment->schoolClass->name }}</small>
+                                                </div>
+                                                <div class="card-body">
+                                                    <p class="card-text small text-muted mb-3">
+                                                        {{ Str::limit($assignment->description, 100) }}
+                                                    </p>
+                                                    
+                                                    <div class="mb-3">
+                                                        <span class="badge bg-primary px-3 py-2 mb-2 d-inline-block">
+                                                            <i class="fas fa-calendar me-1"></i>
+                                                            {{ $assignment->due_date->format('d/m/Y') }}
+                                                            @if($assignment->due_time)
+                                                                às {{ $assignment->due_time }}
+                                                            @endif
+                                                        </span>
+                                                        <span class="badge bg-info px-3 py-2 mb-2 d-inline-block">
+                                                            <i class="fas fa-star me-1"></i>
+                                                            {{ $assignment->max_points }} pts
+                                                        </span>
+                                                    </div>
+
+                                                    <!-- Status da entrega -->
+                                                    @if($assignment->student_submission)
+                                                        <div class="alert alert-success py-2 mb-3">
+                                                            <i class="fas fa-check-circle me-2"></i>
+                                                            <strong>Entregue em:</strong> 
+                                                            {{ \Carbon\Carbon::parse($assignment->student_submission->submitted_at)->format('d/m/Y H:i') }}
+                                                        </div>
+                                                    @elseif($assignment->is_expired)
+                                                        <div class="alert alert-danger py-2 mb-3">
+                                                            <i class="fas fa-clock me-2"></i>
+                                                            <strong>Prazo expirado</strong>
+                                                        </div>
+                                                    @else
+                                                        <div class="alert alert-warning py-2 mb-3">
+                                                            <i class="fas fa-exclamation-circle me-2"></i>
+                                                            <strong>Aguardando entrega</strong>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                                <div class="card-footer bg-white border-0 pt-0">
+                                                    <div class="d-grid gap-2">
+                                                        @if($assignment->can_submit)
+                                                            <a href="{{ route('student.assignment.submit', $assignment->id) }}" 
+                                                               class="btn btn-success btn-sm">
+                                                                <i class="fas fa-paper-plane me-1"></i>
+                                                                Entregar Trabalho
+                                                            </a>
+                                                        @endif
+                                                        
+                                                        <a href="{{ route('student.assignment.show', $assignment->id) }}" 
+                                                           class="btn btn-outline-primary btn-sm">
+                                                            <i class="fas fa-eye me-1"></i>
+                                                            Ver Detalhes
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="text-center py-5 text-muted">
+                                    <i class="fas fa-clipboard-list fa-3x mb-3"></i>
+                                    <p class="mb-2">Nenhum trabalho disponível no momento</p>
+                                    <p class="small">Novos trabalhos aparecerão aqui quando forem criados pelo professor.</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light">
+                        @php
+                            $pendingAssignments = $assignments->where('can_submit', true)->count();
+                            $submittedAssignments = $assignments->where('student_submission', '!=', null)->count();
+                            $expiredAssignments = $assignments->where('is_expired', true)->where('student_submission', null)->count();
+                        @endphp
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Resumo: {{ $pendingAssignments }} pendentes • 
+                            {{ $submittedAssignments }} entregues • 
+                            {{ $expiredAssignments }} expirados
+                        </small>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
 
         <!-- Informações adicionais -->
         <div class="row mt-4">
@@ -245,6 +339,10 @@
                             <div class="col-md-3">
                                 <strong>📢 Avisos:</strong> 
                                 {{ $classInformations->count() }}
+                            </div>
+                            <div class="col-md-3">
+                                <strong>📚 Conteúdos:</strong> 
+                                {{ $contents->count() }}
                             </div>
                             <div class="col-md-3">
                                 <strong>📝 Trabalhos:</strong> 

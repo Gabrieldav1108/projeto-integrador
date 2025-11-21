@@ -319,6 +319,8 @@
                     </div>
                 </div>
             </div>
+            <x-class-contents :schoolClass="$schoolClass" :teacher="$teacher" />
+
 
         <!-- Botão Voltar -->
         <div class="text-center mt-4">
