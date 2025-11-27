@@ -20,6 +20,13 @@ class Teacher extends Model
         'subject_id'
     ];
 
+    protected $casts = [
+        'hire_date' => 'date',
+        'is_active' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
     /**
      * Relacionamento com o usuário
      */

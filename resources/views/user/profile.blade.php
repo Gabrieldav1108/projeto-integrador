@@ -128,14 +128,7 @@
                                         <span class="text-muted">0</span>
                                     @endif
                                 </p>
-                                
-                                <p><strong>Próxima Aula:</strong> 
-                                    @if($totalClasses > 0)
-                                        <a href="{{ route('teacher.schedules') }}">Ver horários</a>
-                                    @else
-                                        <span class="text-muted">Nenhuma turma</span>
-                                    @endif
-                                </p>
+                        
                                 
                                 <p><strong>Disciplina Principal:</strong> 
                                     @if($mainSubject)
@@ -171,12 +164,7 @@
                                 
                                 <p><strong>Turmas Matriculadas:</strong> {{ $studentClasses }}</p>
                                 <p><strong>Média Geral:</strong> {{ $averageGrade }}</p>
-                                <p><strong>Próxima Aula:</strong> 
-                                    @if($studentClasses > 0)
-                                        <a href="{{ route('student.schedules.index') }}">Ver horários</a>
-                                    @else
                                         <span class="text-muted">Nenhuma turma</span>
-                                    @endif
                                 </p>
                             @endif
                         </div>
@@ -218,11 +206,6 @@
                                 <div class="col-md-4">
                                     <a href="{{ route('teacher.home') }}" class="btn btn-outline-primary w-100">
                                         <i class="fas fa-chalkboard"></i> Minhas Turmas
-                                    </a>
-                                </div>
-                                <div class="col-md-4">
-                                    <a href="{{ route('teacher.schedules') }}" class="btn btn-outline-success w-100">
-                                        <i class="fas fa-calendar-alt"></i> Meus Horários
                                     </a>
                                 </div>
                             @elseif($user->role === 'student')
