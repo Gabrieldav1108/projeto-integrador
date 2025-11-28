@@ -32,9 +32,9 @@
             </div>
             
             <div class="mb-3">
-                <label for="age" class="form-label">Idade</label>
-                <input type="number" name="age" id="age" class="form-control" 
-                       value="{{ old('age', $student->age) }}" required>
+                <label for="age" class="form-label">Data de Nascimento</label>
+                <input type="date" name="age" id="age" class="form-control" 
+                value="{{ old('age', $student->birth_date ?? '') }}" required>
             </div>
 
             <div class="mb-3">

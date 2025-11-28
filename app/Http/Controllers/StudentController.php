@@ -14,6 +14,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Log;
 
 class StudentController extends Controller
 {
@@ -32,13 +34,13 @@ class StudentController extends Controller
     public function showSubject($subjectId)
     {
         $user = Auth::user();
-        
+
         // Buscar a matéria
         $subject = Subject::findOrFail($subjectId);
-        
+
         // Verificar se o aluno está matriculado na matéria
         $isStudentInSubject = $subject->schoolClasses()
-            ->whereHas('students', function($query) use ($user) {
+            ->whereHas('students', function ($query) use ($user) {
                 $query->where('users.id', $user->id);
             })->exists();
 
@@ -58,10 +60,10 @@ class StudentController extends Controller
             ->get();
 
         // Buscar professor principal (buscar professores que lecionam esta matéria nas turmas do aluno)
-        $mainTeacher = Teacher::whereHas('schoolClasses', function($query) use ($classIds) {
-                $query->whereIn('classes.id', $classIds);
-            })
-            ->whereHas('subject', function($query) use ($subjectId) {
+        $mainTeacher = Teacher::whereHas('schoolClasses', function ($query) use ($classIds) {
+            $query->whereIn('classes.id', $classIds);
+        })
+            ->whereHas('subject', function ($query) use ($subjectId) {
                 $query->where('subjects.id', $subjectId);
             })
             ->with('user')
@@ -74,7 +76,7 @@ class StudentController extends Controller
             ->active()
             ->orderBy('due_date', 'asc')
             ->get()
-            ->map(function($assignment) use ($user) {
+            ->map(function ($assignment) use ($user) {
                 $assignment->student_submission = $assignment->getStudentSubmission($user->id);
                 $assignment->can_submit = !$assignment->is_expired && !$assignment->hasStudentSubmission($user->id);
                 return $assignment;
@@ -92,15 +94,15 @@ class StudentController extends Controller
     public function showGrades($subjectId = null)
     {
         $user = Auth::user();
-        
+
         // Se não foi passada uma matéria específica, busca todas as matérias do aluno
         if ($subjectId) {
             // Buscar notas de uma matéria específica
             $subject = Subject::with(['teachers', 'schoolClasses.students'])->findOrFail($subjectId);
-            
+
             // Verificar se o aluno está matriculado nesta matéria
             $isStudentInSubject = $subject->schoolClasses()
-                ->whereHas('students', function($query) use ($user) {
+                ->whereHas('students', function ($query) use ($user) {
                     $query->where('users.id', $user->id);
                 })->exists();
 
@@ -117,7 +119,7 @@ class StudentController extends Controller
             $subjects = collect([$subject]);
         } else {
             // Buscar todas as matérias do aluno com suas notas
-            $subjects = Subject::whereHas('schoolClasses.students', function($query) use ($user) {
+            $subjects = Subject::whereHas('schoolClasses.students', function ($query) use ($user) {
                 $query->where('users.id', $user->id);
             })->with(['teachers'])->get();
 
@@ -134,19 +136,18 @@ class StudentController extends Controller
         $schoolClasses = SchoolClass::all();
         return view('admin.students.create', compact('schoolClasses'));
     }
-    
+
     public function store(Request $request)
     {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users', // Corrigido para 'users'
-            'age' => 'required|integer|min:1|max:25',
+            'email' => 'required|string|email|max:255|unique:users',
+            'age' => 'required|date|before:today', // Valida como data
             'password' => 'required|string|min:6|confirmed',
             'class_id' => 'required|exists:classes,id',
         ]);
 
         DB::transaction(function () use ($validatedData) {
-            // 1. Criar usuário para login - SEM class_id na tabela users
             $user = User::create([
                 'name' => $validatedData['name'],
                 'email' => $validatedData['email'],
@@ -156,14 +157,26 @@ class StudentController extends Controller
 
             $user->schoolClasses()->attach($validatedData['class_id']);
 
-            Student::create([
+            // Calcular idade a partir da data de nascimento
+            $birthDate = new \DateTime($validatedData['age']);
+            $today = new \DateTime();
+            $age = $today->diff($birthDate)->y;
+
+            $studentData = [
                 'name' => $validatedData['name'],
                 'email' => $validatedData['email'],
-                'age' => $validatedData['age'],
+                'age' => $age,
+                'birth_date' => $validatedData['age'],
                 'password' => Hash::make($validatedData['password']),
                 'class_id' => $validatedData['class_id'],
-                'user_id' => $user->id, 
-            ]);
+            ];
+
+            // Adicionar user_id apenas se a coluna existir na tabela 'student'
+            if (Schema::hasColumn('student', 'user_id')) {
+                $studentData['user_id'] = $user->id;
+            }
+
+            Student::create($studentData);
         });
 
         return redirect()->route('admin.students.index')->with('success', 'Estudante criado e matriculado na turma com sucesso!');
@@ -173,52 +186,107 @@ class StudentController extends Controller
     {
         $student = Student::findOrFail($id);
         $schoolClasses = SchoolClass::all();
-        
+
         // Buscar o usuário correspondente
         $user = User::where('email', $student->email)->first();
-        
+
         return view('admin.students.edit', compact('student', 'schoolClasses', 'user'));
     }
 
     public function update(Request $request, $id)
     {
-        $student = Student::findOrFail($id);
-
         $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:students,email,' . $student->id . '|unique:users,email,' . $student->user_id,
-            'age' => 'required|integer|min:1|max:25',
-            'password' => 'nullable|string|min:6',
-            'class_id' => 'required|exists:classes,id',
+            'name' => 'sometimes|string|max:255',
+            'age' => 'sometimes|date|before:today',
+            'class_id' => 'sometimes|exists:classes,id',
+            'email' => 'sometimes|email',
         ]);
 
-        DB::transaction(function () use ($student, $validatedData) {
-            // 1. Atualizar estudante
-            $student->update([
-                'name' => $validatedData['name'],
-                'email' => $validatedData['email'],
-                'age' => $validatedData['age'],
-                'class_id' => $validatedData['class_id'],
-                'password' => !empty($validatedData['password']) 
-                    ? Hash::make($validatedData['password']) 
-                    : $student->password,
-            ]);
+        DB::transaction(function () use ($validatedData, $id) {
 
-            // 2. Atualizar usuário correspondente
-            $user = User::find($student->user_id);
-            if ($user) {
-                // Atualizar matrícula na tabela pivô
-                $user->schoolClasses()->sync([$validatedData['class_id']]);
-                
-                // Atualizar dados do usuário
-                $user->update([
-                    'name' => $validatedData['name'],
-                    'email' => $validatedData['email'],
-                    'password' => !empty($validatedData['password']) 
-                        ? Hash::make($validatedData['password']) 
-                        : $user->password,
-                ]);
+            // Recarregar o estudante dentro da transação para garantir que é uma instância existente
+            $student = Student::findOrFail($id);
+
+            // Se o student não tem user_id, tentar associar a um usuário existente pelo email
+            if (!$student->user_id) {
+                $userName = $validatedData['name'] ?? $student->name ?? 'Aluno';
+                $userEmail = $validatedData['email'] ?? $student->email ?? null;
+
+                $user = null;
+
+                if ($userEmail) {
+                    $user = User::where('email', $userEmail)->first();
+                }
+
+                if ($user) {
+                    // Se existir um user com esse email, apenas associe (se houver coluna)
+                    if (Schema::hasColumn($student->getTable(), 'user_id')) {
+                        $student->user_id = $user->id;
+                    }
+
+                    // Garantir que o student.email esteja preenchido (migration exige NOT NULL)
+                    if (empty($student->email)) {
+                        $student->email = $user->email;
+                    }
+                } else {
+                    // Se não existir, criar novo usuário — garante email único gerado quando necessário
+                    if (!$userEmail) {
+                        $userEmail = 'student+' . uniqid() . '@example.com';
+                    }
+
+                    $user = User::create([
+                        'name' => $userName,
+                        'email' => $userEmail,
+                        'password' => Hash::make('password123'),
+                        'role' => 'student',
+                    ]);
+
+                    if (Schema::hasColumn($student->getTable(), 'user_id')) {
+                        $student->user_id = $user->id;
+                    }
+
+                    // Atribuir o email gerado também ao estudante para evitar NOT NULL
+                    if (empty($student->email)) {
+                        $student->email = $userEmail;
+                    }
+                }
             }
+
+            // Recarregar relação user para ter certeza
+            $student->load('user');
+
+            // Atribuir explicitamente os campos no modelo Student e salvar no final.
+            if (isset($validatedData['name'])) {
+                // Atualizar também o usuário, se existir
+                if ($student->user) {
+                    $student->user->update(['name' => $validatedData['name']]);
+                }
+                $student->name = $validatedData['name'];
+            }
+
+            if (isset($validatedData['class_id'])) {
+                if ($student->user) {
+                    $student->user->schoolClasses()->sync([$validatedData['class_id']]);
+                }
+                $student->class_id = $validatedData['class_id'];
+            }
+
+            if (isset($validatedData['age'])) {
+                $birthDate = new \DateTime($validatedData['age']);
+                $today = new \DateTime();
+                $age = $today->diff($birthDate)->y;
+
+                $student->age = $age;
+                $student->birth_date = $validatedData['age'];
+            }
+
+            // Certificar email antes de salvar (migration exige NOT NULL)
+            if (empty($student->email)) {
+                $student->email = 'student+' . uniqid() . '@example.com';
+            }
+
+            // Salva o estudante (persistirá user_id apenas se a coluna existir)
+            $student->save();
         });
 
         return redirect()->route('admin.students.index')->with('success', 'Estudante atualizado com sucesso!');
@@ -227,7 +295,7 @@ class StudentController extends Controller
     public function destroy($id)
     {
         $student = Student::findOrFail($id);
-        
+
         DB::transaction(function () use ($student) {
             // Encontrar e deletar o usuário pelo user_id (mais confiável)
             $user = User::find($student->user_id);
@@ -236,7 +304,7 @@ class StudentController extends Controller
                 $user->schoolClasses()->detach();
                 $user->delete();
             }
-            
+
             $student->delete();
         });
 

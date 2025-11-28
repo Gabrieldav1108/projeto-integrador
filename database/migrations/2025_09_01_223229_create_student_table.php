@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->integer('age');
+            $table->date('birth_date')->nullable()->after('age');
             $table->string('password');
             $table->foreignId('class_id')->constrained('classes')->onDelete('cascade');
             $table->timestamps();

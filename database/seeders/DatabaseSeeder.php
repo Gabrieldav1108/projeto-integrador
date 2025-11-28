@@ -15,6 +15,10 @@ class DatabaseSeeder extends Seeder
             TeacherSeeder::class,
             StudentSeeder::class,
             RelationshipSeeder::class,
+            AssignmentSeeder::class,
+            ClassContentSeeder::class,
+            GradesSeeder::class,
+            ClassInformationSeeder::class,
         ]);
     }
 }

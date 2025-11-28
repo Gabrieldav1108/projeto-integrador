@@ -27,8 +27,8 @@
             </div>
 
             <div class="mb-3">
-                <label for="age" class="form-label">Idade</label>
-                <input type="number" name="age" id="age" class="form-control" required>
+                <label for="age" class="form-label">Data de Nascimento</label>
+                <input type="date" name="age" id="age" class="form-control" required>
             </div>
 
             <div class="mb-3">

@@ -8,6 +8,7 @@ use App\Models\Subject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class TeacherController extends Controller
 {
@@ -71,9 +72,10 @@ class TeacherController extends Controller
 
     public function update(Request $request, Teacher $teacher)
     {
+        // Validar formato do email; lógica de existência/uniqueness é tratada abaixo
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:teachers,email,' . $teacher->id . '|unique:users,email,' . $teacher->user_id,
+            'email' => 'required|email',
             'password' => 'nullable|min:6',
             'subject_id' => 'required|exists:subjects,id',
             'phone' => 'nullable|string|max:20',
@@ -82,20 +84,39 @@ class TeacherController extends Controller
         ]);
 
         DB::transaction(function () use ($teacher, $validated, $request) {
-            // 1. Atualizar usuário na tabela users
-            $user = User::find($teacher->user_id);
+            // 1. Verificar se já existe um User com esse email
+            $user = User::where('email', $validated['email'])->first();
+
             if ($user) {
-                $userData = [
+                // Se existir e for diferente do user atual, associar
+                if (empty($teacher->user_id) || $teacher->user_id != $user->id) {
+                    if (Schema::hasColumn($teacher->getTable(), 'user_id')) {
+                        $teacher->user_id = $user->id;
+                    }
+                }
+            } else {
+                // Não existe: criar novo usuário
+                $user = User::create([
                     'name' => $validated['name'],
                     'email' => $validated['email'],
-                ];
+                    'password' => !empty($validated['password']) ? Hash::make($validated['password']) : Hash::make('password123'),
+                    'role' => 'teacher',
+                ]);
 
-                if (!empty($validated['password'])) {
-                    $userData['password'] = Hash::make($validated['password']);
+                if (Schema::hasColumn($teacher->getTable(), 'user_id')) {
+                    $teacher->user_id = $user->id;
                 }
-
-                $user->update($userData);
             }
+
+            // Atualizar dados do usuário encontrado/criado
+            $userData = [
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+            ];
+            if (!empty($validated['password'])) {
+                $userData['password'] = Hash::make($validated['password']);
+            }
+            $user->update($userData);
 
             // 2. Atualizar registro na tabela teachers
             $teacherData = [
@@ -109,6 +130,11 @@ class TeacherController extends Controller
 
             if (!empty($validated['password'])) {
                 $teacherData['password'] = Hash::make($validated['password']);
+            }
+
+            // Se fizemos atribuição direta em $teacher->user_id acima, persista antes do update
+            if (isset($teacher->user_id)) {
+                $teacher->save();
             }
 
             $teacher->update($teacherData);

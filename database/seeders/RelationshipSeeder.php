@@ -5,45 +5,60 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class RelationshipSeeder extends Seeder
 {
     public function run(): void
     {
-        // class_user - relaciona professores com turmas
-        $classTeachers = [
-            ['class_id' => 1, 'user_id' => 2], // Carlos - 6ºA
-            ['class_id' => 2, 'user_id' => 2], // Carlos - 6ºB
-            ['class_id' => 3, 'user_id' => 3], // Ana - 7ºA
-            ['class_id' => 4, 'user_id' => 3], // Ana - 7ºB
-            ['class_id' => 5, 'user_id' => 4], // João - 8ºA
-            ['class_id' => 6, 'user_id' => 4], // João - 8ºB
-            ['class_id' => 7, 'user_id' => 5], // Maria - 9ºA
-            ['class_id' => 8, 'user_id' => 5], // Maria - 9ºB
+        // class_user - relaciona professores com turmas (buscando usuários por email)
+        $teacherAssignments = [
+            'carlos.silva@escola.com' => [1,2,3,4],
+            'ana.santos@escola.com' => [1,2,3,4,5,6,7,8],
+            'joao.pereira@escola.com' => [5,6,7,8],
+            'maria.oliveira@escola.com' => [1,2,7,8],
         ];
 
-        foreach ($classTeachers as $relation) {
-            DB::table('class_user')->insert(array_merge($relation, [
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]));
+        foreach ($teacherAssignments as $email => $classIds) {
+            $user = DB::table('users')->where('email', $email)->first();
+            if (!$user) {
+                Log::warning("Teacher user not found for email: {$email}");
+                continue;
+            }
+
+            foreach ($classIds as $classId) {
+                DB::table('class_user')->insert([
+                    'class_id' => $classId,
+                    'user_id' => $user->id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
         }
 
-        // class_user - relaciona ALUNOS (users) com turmas
-        $classStudents = [
-            ['class_id' => 1, 'user_id' => 6],  // Pedro - 6ºA
-            ['class_id' => 1, 'user_id' => 7],  // Mariana - 6ºA
-            ['class_id' => 3, 'user_id' => 8],  // Lucas - 7ºA
-            ['class_id' => 3, 'user_id' => 9],  // Sofia - 7ºA
-            ['class_id' => 5, 'user_id' => 10], // Bruno - 8ºA
-            ['class_id' => 5, 'user_id' => 11], // Carla - 8ºA
+        // class_user - relaciona alunos (buscar users por email)
+        $studentAssignments = [
+            'pedro.costa@escola.com' => 1,
+            'mariana.lima@escola.com' => 1,
+            'lucas.almeida@escola.com' => 3,
+            'sofia.rodrigues@escola.com' => 3,
+            'bruno.santos@escola.com' => 5,
+            'carla.mendes@escola.com' => 5,
         ];
 
-        foreach ($classStudents as $relation) {
-            DB::table('class_user')->insert(array_merge($relation, [
+        foreach ($studentAssignments as $email => $classId) {
+            $user = DB::table('users')->where('email', $email)->first();
+            if (!$user) {
+                Log::warning("Student user not found for email: {$email}");
+                continue;
+            }
+
+            DB::table('class_user')->insert([
+                'class_id' => $classId,
+                'user_id' => $user->id,
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]));
+            ]);
         }
 
         // class_subject - relaciona turmas com matérias
@@ -62,22 +77,29 @@ class RelationshipSeeder extends Seeder
         }
 
         // class_teacher - relaciona turmas com professores (tabela teachers)
-        $classTeacherRelations = [
-            ['class_id' => 1, 'teacher_id' => 1], // Carlos - 6ºA
-            ['class_id' => 2, 'teacher_id' => 1], // Carlos - 6ºB
-            ['class_id' => 3, 'teacher_id' => 2], // Ana - 7ºA
-            ['class_id' => 4, 'teacher_id' => 2], // Ana - 7ºB
-            ['class_id' => 5, 'teacher_id' => 3], // João - 8ºA
-            ['class_id' => 6, 'teacher_id' => 3], // João - 8ºB
-            ['class_id' => 7, 'teacher_id' => 4], // Maria - 9ºA
-            ['class_id' => 8, 'teacher_id' => 4], // Maria - 9ºB
+        // class_teacher - relaciona turmas com professores (buscar teachers por email)
+        $teacherClassMap = [
+            'carlos.silva@escola.com' => [1,2],
+            'ana.santos@escola.com' => [3,4],
+            'joao.pereira@escola.com' => [5,6],
+            'maria.oliveira@escola.com' => [7,8],
         ];
 
-        foreach ($classTeacherRelations as $relation) {
-            DB::table('class_teacher')->insert(array_merge($relation, [
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]));
+        foreach ($teacherClassMap as $email => $classIds) {
+            $teacher = DB::table('teachers')->where('email', $email)->first();
+            if (!$teacher) {
+                Log::warning("Teacher record not found for email: {$email}");
+                continue;
+            }
+
+            foreach ($classIds as $classId) {
+                DB::table('class_teacher')->insert([
+                    'class_id' => $classId,
+                    'teacher_id' => $teacher->id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
         }
     }
 }
